@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30907.101
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ERBPP", "ERBPP\ERBPP.csproj", "{993EA677-D10A-4662-89AA-1C247B440A29}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{993EA677-D10A-4662-89AA-1C247B440A29}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{993EA677-D10A-4662-89AA-1C247B440A29}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{993EA677-D10A-4662-89AA-1C247B440A29}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{993EA677-D10A-4662-89AA-1C247B440A29}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {689A3618-6F3C-4EFD-A69F-9ED55AE71E1D}
+	EndGlobalSection
+EndGlobal
