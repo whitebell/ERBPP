@@ -15,10 +15,10 @@ namespace ERBPP
             using var fs = File.Open("D:\\Game\\eratoho\\EVENT_K14\\EVENT_K14.ERB", FileMode.Open, FileAccess.Read);
             using var sr = new StreamReader(fs, Encoding.UTF8);
             using var fw = File.Open("D:\\Game\\eratoho\\EVENT_K14\\EVENT_K14.PP.ERB", FileMode.Create, FileAccess.Write);
-            using var sw = new StreamWriter(fw, Encoding.UTF8);
+            using var sw = new StreamWriter(fw, Encoding.UTF8) { AutoFlush = true };
 #elif RELEASE
             var sr = new StreamReader(Console.OpenStandardInput(), Encoding.UTF8);
-            var sw = new StreamWriter(Console.OpenStandardOutput(), Encoding.UTF8);
+            var sw = new StreamWriter(Console.OpenStandardOutput(), Encoding.UTF8) { AutoFlush = true };
 #endif
 
             string l;
