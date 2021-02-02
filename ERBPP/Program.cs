@@ -38,7 +38,7 @@ namespace ERBPP
 
                     case LineType.FunctionDefinition:
                         if (curIndentLv != 0)
-                            throw new Exception();
+                            throw new FormatException("indented func def."); // 関数定義行でインデントされているのはおかしいので例外投げる
 
                         sw.WriteLine(l);
                         break;
@@ -91,7 +91,7 @@ namespace ERBPP
                         sw.Write(new string('\t', curIndentLv));
                         sw.WriteLine(l);
                         if ((l = sr.ReadLine()?.TrimStart()) is null)
-                            throw new Exception();
+                            throw new FormatException("last line sif");
                         sw.Write(new string('\t', curIndentLv + 1));
                         sw.WriteLine(l);
                         break;
@@ -154,7 +154,7 @@ namespace ERBPP
                                 }
                                     break;
                             default:
-                                throw new Exception();
+                                throw new NotImplementedException(); // ここにくるような実装を書いていないので仕様を定めていない
                         }
                         l = nl;
                         goto REDO;
@@ -392,7 +392,7 @@ namespace ERBPP
                     default:
                         if (variable.Contains(ident))
                             return new Token { Type = LineType.Variable };
-                        throw new Exception();
+                        throw new FormatException("unknown ident name");
                 }
             }
         }
