@@ -241,6 +241,7 @@ namespace ERBPP
             }
             else if (IsFunctionStart(ss.Current))
             {
+                variable.Clear();
                 return new Token { Type = LineType.FunctionDefinition };
             }
             else if (IsAttributeStart(ss.Current))
