@@ -4,12 +4,20 @@
 
 ERBファイルのインデントを自動でやるやつ。名前的にはプリティプリンタぽいけどそこまでの機能はない。
 
+## 動作環境
+
+Windows x64。作者はWindows 10 (20H2) x64で動かしています。
+
+## 必要なもの
+
+[.NET 5](https://dotnet.microsoft.com/download/dotnet/5.0)
+
 ## 使い方
 
 標準入力から読んで、標準出力に書き出すだけ。
 
 ```
-more FOO.ERB | ERBPP > FOO.INDENT.ERB
+ERBPP < INPUT.ERB > OUTPUT.ERB
 ```
 
 ## 現状の制限
