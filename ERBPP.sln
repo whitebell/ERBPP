@@ -3,7 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30907.101
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ERBPP", "ERBPP\ERBPP.csproj", "{993EA677-D10A-4662-89AA-1C247B440A29}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ERBPP", "ERBPP\ERBPP.csproj", "{993EA677-D10A-4662-89AA-1C247B440A29}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F357F67C-CCED-4087-83A0-1CB99E2A161A}"
+	ProjectSection(SolutionItems) = preProject
+		License = License
+		readme.md = readme.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
