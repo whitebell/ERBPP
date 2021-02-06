@@ -65,6 +65,7 @@ namespace ERBPP
                         break;
                     case LineType.ElseIf:
                     case LineType.Else:
+                    case LineType.CaseElse:
                         sw.Write(new string('\t', curIndentLv - 1));
                         sw.WriteLine(l);
                         break;
@@ -81,10 +82,6 @@ namespace ERBPP
                             sw.Write(new string('\t', curIndentLv++));
                         else
                             sw.Write(new string('\t', curIndentLv - 1));
-                        sw.WriteLine(l);
-                        break;
-                    case LineType.CaseElse:
-                        sw.Write(new string('\t', curIndentLv - 1));
                         sw.WriteLine(l);
                         break;
                     case LineType.EndSelect:
@@ -270,17 +267,12 @@ namespace ERBPP
                     SkipSpace();
                 }
 
-                var ident = GetIdent().ToLower();
-
-                switch (ident)
+                return GetIdent().ToLower() switch
                 {
-                    case "region":
-                        return new Token { Type = LineType.StartRegionComment };
-                    case "endregion":
-                        return new Token { Type = LineType.EndRegionComment };
-                    default:
-                        return new Token { Type = LineType.Comment };
-                }
+                    "region"    => new Token { Type = LineType.StartRegionComment },
+                    "endregion" => new Token { Type = LineType.EndRegionComment },
+                    _           => new Token { Type = LineType.Comment },
+                };
             }
             else if (IsFunctionStart(ss.Current))
             {
@@ -290,8 +282,7 @@ namespace ERBPP
             else if (IsAttributeStart(ss.Current))
             {
                 Consume('#');
-                var ident = GetIdent().ToUpper();
-                switch (ident)
+                switch (GetIdent().ToUpper())
                 {
                     case "FUNCTION":
                     case "LATER":
@@ -436,7 +427,7 @@ namespace ERBPP
                     default:
                         if (variable.Contains(ident))
                             return new Token { Type = LineType.Variable };
-                        throw new FormatException("unknown ident name");
+                        throw new FormatException($"unknown ident name ({ident})");
                         //return new Token { Type = LineType.ErhUserDefVariable }; // ERHで定義されたグローバルなUDVだとここに来る
                         //現状では上のcaseで判定していない関数/変数があるのでそれもここにきてしまう。
                 }
