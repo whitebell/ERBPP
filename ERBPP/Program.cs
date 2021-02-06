@@ -24,6 +24,7 @@ namespace ERBPP
             string l;
             var curIndentLv = 0;
             var prevType = LineType.Unknown;
+            var regionStack = new Stack<int>();
             while ((l = sr.ReadLine()?.TrimStart()) is not null)
             {
             REDO:
@@ -43,8 +44,13 @@ namespace ERBPP
                         sw.WriteLine(l);
                         break;
 
-                    case LineType.StartRegionComment:
                     case LineType.EndRegionComment:
+                        {
+                            if (!regionStack.TryPop(out var res))
+                                throw new FormatException("region/endregion stack err.");
+                            else
+                                sw.Write(new string('\t', res));
+                        }
                         sw.WriteLine(l);
                         break;
 
@@ -97,6 +103,7 @@ namespace ERBPP
                         break;
 
                     case LineType.Comment:
+                    case LineType.StartRegionComment:
                         var lst = new List<(LineType, string)> { (t.Type, l) };
                         string nl;
                         LineType nextType = LineType.Unknown;
@@ -119,42 +126,74 @@ namespace ERBPP
                     BREAK:
                         switch (nextType)
                         {
-                            case LineType.Call:
-                            case LineType.Return:
-                            case LineType.BuiltinFunction:
-                            case LineType.FunctionDefinition:
-                            case LineType.Variable:
-                            case LineType.Endif:
-                            case LineType.If:
-                            case LineType.Sif:
-                            case LineType.SelectCase:
-                                foreach (var e in lst)
-                                {
-                                    sw.Write(new string('\t', curIndentLv));
-                                    sw.WriteLine(e.Item2);
-                                }
-                                break;
                             case LineType.ElseIf:
                             case LineType.Else:
                             case LineType.Case:
                             case LineType.CaseElse:
                             case LineType.Repeat:
+                            case LineType.EndSelect:
                                 foreach (var e in lst)
                                 {
-                                    if (e.Item1 != LineType.Blank)
+                                    if (e.Item1 == LineType.Blank)
                                     {
-                                        var indentLv = nextType == LineType.Case && prevType == LineType.SelectCase ? curIndentLv : Math.Max(0, curIndentLv - 1);
-                                        sw.Write(new string('\t', indentLv));
-                                        sw.WriteLine(e.Item2);
+                                        sw.WriteLine();
                                     }
                                     else
                                     {
-                                        sw.WriteLine();
+                                        var indentLv = nextType == LineType.Case && prevType == LineType.SelectCase ? curIndentLv : Math.Max(0, curIndentLv - 1);
+                                        switch (e.Item1)
+                                        {
+                                            case LineType.StartRegionComment:
+                                                regionStack.Push(indentLv);
+                                                sw.Write(new string('\t', indentLv));
+                                                sw.WriteLine(e.Item2);
+                                                break;
+                                            case LineType.EndRegionComment:
+                                                {
+                                                    if (!regionStack.TryPop(out var res))
+                                                        throw new FormatException("region/endregion stack err.");
+                                                    else
+                                                        sw.Write(new string('\t', res));
+                                                }
+                                                sw.WriteLine(e.Item2);
+                                                break;
+                                            default:
+                                                sw.Write(new string('\t', indentLv));
+                                                sw.WriteLine(e.Item2);
+                                                break;
+                                        }
                                     }
                                 }
                                     break;
                             default:
-                                throw new NotImplementedException(); // ここにくるような実装を書いていないので仕様を定めていない
+                                foreach (var e in lst)
+                                {
+                                    switch (e.Item1)
+                                    {
+                                        case LineType.Blank:
+                                            sw.WriteLine();
+                                            break;
+                                        case LineType.StartRegionComment:
+                                            regionStack.Push(curIndentLv);
+                                            sw.Write(new string('\t', curIndentLv));
+                                            sw.WriteLine(e.Item2);
+                                            break;
+                                        case LineType.EndRegionComment:
+                                            {
+                                                if (!regionStack.TryPop(out var res))
+                                                    throw new FormatException("region/endregion stack err.");
+                                                else
+                                                    sw.Write(new string('\t', res));
+                                            }
+                                            sw.WriteLine(e.Item2);
+                                            break;
+                                        default:
+                                            sw.Write(new string('\t', curIndentLv));
+                                            sw.WriteLine(e.Item2);
+                                            break;
+                                    }
+                                }
+                                break;
                         }
                         l = nl;
                         goto REDO;
@@ -167,7 +206,11 @@ namespace ERBPP
 
                 if (t.Type != LineType.Blank && t.Type != LineType.Comment && t.Type != LineType.StartRegionComment && t.Type != LineType.EndRegionComment)
                     prevType = t.Type;
+                sw.Flush();
             }
+
+            if (regionStack.Count != 0)
+                throw new FormatException($"region/endregion stack err. c={regionStack.Count}");
         }
     }
 
@@ -389,10 +432,13 @@ namespace ERBPP
                     case "Y":
                     case "Z":
                         return new Token { Type = LineType.Variable };
+
                     default:
                         if (variable.Contains(ident))
                             return new Token { Type = LineType.Variable };
                         throw new FormatException("unknown ident name");
+                        //return new Token { Type = LineType.ErhUserDefVariable }; // ERHで定義されたグローバルなUDVだとここに来る
+                        //現状では上のcaseで判定していない関数/変数があるのでそれもここにきてしまう。
                 }
             }
         }
@@ -487,6 +533,11 @@ namespace ERBPP
         /// 変数
         /// </summary>
         Variable,
+
+        /// <summary>
+        /// ERHで定義されたグローバルなユーザ定義変数
+        /// </summary>
+        ErhUserDefVariable,
 
         Unknown,
     }
