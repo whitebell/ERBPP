@@ -28,6 +28,8 @@ namespace ERBPP
             while ((l = sr.ReadLine()?.TrimStart()) is not null)
             {
             REDO:
+                if (l is null)
+                    break; // goto REDO でここに戻った場合 l が null でありうる
 
                 var t = new PseudoLexer(l).GetToken();
 
@@ -241,7 +243,12 @@ namespace ERBPP
         private string GetIdent()
         {
             var sb = new StringBuilder();
-            while (!ss.EndOfStream && Char.IsLetterOrDigit(ss.Current) && !IsVariableSeparator(ss.Current))
+            if (!ss.EndOfStream && IsIdentCharFirst(ss.Current) && !IsVariableSeparator(ss.Current))
+            {
+                ss.NextChar(out var c);
+                sb.Append(c);
+            }
+            while (!ss.EndOfStream && IsIdentChar(ss.Current) && !IsVariableSeparator(ss.Current))
             {
                 ss.NextChar(out var c);
                 sb.Append(c);
@@ -293,6 +300,11 @@ namespace ERBPP
                         {
                             SkipSpace();
                             var v = GetIdent();
+                            if (v.Equals("dynamic", StringComparison.OrdinalIgnoreCase))
+                            {
+                                SkipSpace();
+                                v = GetIdent();
+                            }
                             if (!variable.Contains(v))
                                 variable.Add(v);
                             return new Token { Type = LineType.VariableDefinition };
@@ -300,6 +312,10 @@ namespace ERBPP
                     default:
                         return new Token { Type = LineType.Unknown };
                 }
+            }
+            else if (IsLabelStart(ss.Current))
+            {
+                return new Token { Type = LineType.Label };
             }
             else
             {
@@ -345,11 +361,28 @@ namespace ERBPP
                     case "BREAK":
                         return new Token { Type = LineType.Break };
 
+                    case "CONTINUE":
+                        return new Token { Type = LineType.Continue };
+
+                    case "BEGIN":
+                        return new Token { Type = LineType.Begin };
+
+                    case "RESTART":
+                        return new Token { Type = LineType.Restart };
+
                     case "CALL":
+                    case "CALLF":
                     case "CALLFORM":
                     case "TRYCALL":
                     case "TRYCALLFORM":
                         return new Token { Type = LineType.Call };
+
+                    case "JUMP":
+                    case "JUMPFORM":
+                        return new Token { Type = LineType.Jump };
+
+                    case "GOTO":
+                        return new Token { Type = LineType.Goto };
 
                     case "RETURN":
                     case "RETURNF":
@@ -367,35 +400,140 @@ namespace ERBPP
                     case "ENDDATA":
                         return new Token { Type = LineType.EndData };
 
+                    case "ADDCHARA":
+                    case "ADDSPCHARA":
+                    case "ARRAYREMOVE":
+                    case "ARRAYSHIFT":
+                    case "BAR":
+                    case "CLEARBIT":
+                    case "CLEARLINE":
+                    case "CSVABL":
+                    case "CSVCALLNAME":
+                    case "CSVCSTR":
+                    case "CSVNAME":
+                    case "CUSTOMDRAWLINE":
+                    case "DELCHARA":
                     case "DRAWLINE":
                     case "EXISTCSV":
                     case "FONTBOLD":
                     case "FONTREGULAR":
+                    case "GETBIT":
+                    case "GETCHARA":
+                    case "GETPALAMLV":
+                    case "INPUT":
+                    case "INPUTS":
+                    case "INVERTBIT":
+                    case "LOADGAME":
+                    case "LOADGLOBAL":
+                    case "ONEINPUT":
+                    case "ONEINPUTS":
+                    case "POWER":
                     case "PRINT":
+                    case "PRINTBUTTON":
+                    case "PRINTC":
+                    case "PRINTCD":
                     case "PRINTL":
+                    case "PRINTLC":
+                    case "PRINTS":
+                    case "PRINTSD":
+                    case "PRINTSINGLEFORM":
+                    case "PRINTSL":
+                    case "PRINTSW":
+                    case "PRINTV":
+                    case "PRINTVL":
                     case "PRINTW":
                     case "PRINTFORM":
-                    case "PRINTFORMDW":
+                    case "PRINTFORMC":
+                    case "PRINTFORMCD":
                     case "PRINTFORML":
+                    case "PRINTFORMLC":
+                    case "PRINTFORMDW":
+                    case "PRINTFORMS":
                     case "PRINTFORMW":
+                    case "PUTFORM":
+                    case "REDRAW":
+                    case "REPLACE":
+                    case "RESET_STAIN":
+                    case "RESETCOLOR":
+                    case "RESETDATA":
+                    case "REUSELASTLINE":
+                    case "SAVEGAME":
+                    case "SAVEGLOBAL":
+                    case "SETBGCOLOR":
+                    case "SETCOLOR":
+                    case "SETFONT":
+                    case "SKIPDISP":
+                    case "SORTCHARA":
+                    case "SPLIT":
+                    case "STRLENS":
+                    case "SWAPCHARA":
+                    case "TIMES":
+                    case "TINPUT":
+                    case "TWAIT":
+                    case "UPCHECK":
                     case "QUIT":
                     case "SETBIT":
+                    case "VARSET":
+                    case "VARSIZE":
+                    case "WAIT":
                         return new Token { Type = LineType.BuiltinFunction };
 
+                    case "MASTER":
+                    case "PLAYER":
+                    case "TARGET":
+                    case "ASSI":
+                    case "ABL":
                     case "ARG":
+                    case "ARGS":
+                    case "ASSIPLAY":
                     case "BASE":
+                    case "MAXBASE":
+                    case "CALLNAME":
+                    case "CDOWN":
                     case "CFLAG":
+                    case "COUNT":
+                    case "CSTR":
+                    case "CUP":
+                    case "DAY":
+                    case "DOWN":
+                    case "DOWNBASE":
+                    case "EJAC":
+                    case "EX":
                     case "EXP":
                     case "FLAG":
+                    case "GLOBAL":
+                    case "GLOBALS":
+                    case "GOTJUEL":
+                    case "ISASSI":
+                    case "ITEM":
+                    case "ITEMSALES":
+                    case "JUEL":
                     case "LOCAL":
                     case "LOCALS":
+                    case "LOSEBASE":
+                    case "MARK":
+                    case "MONEY":
+                    case "NAME":
+                    case "NEXTCOM":
+                    case "NOWEX":
+                    case "PALAM":
+                    case "PBAND":
+                    case "PREVCOM":
+                    case "RELATION":
                     case "RESULT":
                     case "RESULTS":
+                    case "SAVESTR":
                     case "SELECTCOM":
+                    case "SOURCE":
                     case "STAIN":
+                    case "STR":
                     case "TALENT":
                     case "TCVAR":
+                    case "TEQUIP":
                     case "TFLAG":
+                    case "TIME":
+                    case "TSTR":
+                    case "UP":
                     case "A":
                     case "B":
                     case "C":
@@ -438,6 +576,9 @@ namespace ERBPP
         private static bool IsFunctionStart(char c) => c == '@';
         private static bool IsAttributeStart(char c) => c == '#';
         private static bool IsVariableSeparator(char c) => c == ':';
+        private static bool IsLabelStart(char c) => c == '$';
+        private static bool IsIdentCharFirst(char c) => c == '_' || Char.IsLetter(c);
+        private static bool IsIdentChar(char c) => c == '_' || Char.IsLetterOrDigit(c);
         //private static bool IsIdentStart(char c) => Char.IsLetter(c);
 
         //private Token Ident() => throw new NotImplementedException();
@@ -480,6 +621,11 @@ namespace ERBPP
         /// </summary>
         Attribute,
 
+        /// <summary>
+        /// ラベル行
+        /// </summary>
+        Label,
+
         VariableDefinition,
 
         Sif,
@@ -505,7 +651,17 @@ namespace ERBPP
 
         Break,
 
+        Continue,
+
         Call,
+
+        Jump,
+
+        Goto,
+
+        Begin,
+
+        Restart,
 
         Return,
 
