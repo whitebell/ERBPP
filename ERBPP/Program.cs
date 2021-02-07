@@ -61,6 +61,7 @@ namespace ERBPP
                     case LineType.While:
                     case LineType.For:
                     case LineType.Do:
+                    case LineType.TryCallList:
                     case LineType.TryCCall:
                     case LineType.SelectCase:
                     case LineType.PrintData:
@@ -70,7 +71,6 @@ namespace ERBPP
                     case LineType.ElseIf:
                     case LineType.Else:
                     case LineType.Catch:
-                    //case LineType.CaseElse:
                         sw.Write(new string('\t', curIndentLv - 1));
                         sw.WriteLine(l);
                         break;
@@ -79,6 +79,7 @@ namespace ERBPP
                     case LineType.Wend:
                     case LineType.Next:
                     case LineType.Loop:
+                    case LineType.EndFunc:
                     case LineType.EndCatch:
                     case LineType.EndData:
                         sw.Write(new string('\t', --curIndentLv));
@@ -441,6 +442,13 @@ namespace ERBPP
                     case "CONTINUE":
                         return new Token { Type = LineType.Continue };
 
+                    case "TRYCALLLIST":
+                        return new Token { Type = LineType.TryCallList };
+                    case "FUNC":
+                        return new Token { Type = LineType.FuncList };
+                    case "ENDFUNC":
+                        return new Token { Type = LineType.EndFunc };
+
                     case "TRYCCALL":
                     case "TRYCCALLFORM":
                         return new Token { Type = LineType.TryCCall };
@@ -771,6 +779,10 @@ namespace ERBPP
         Break,
 
         Continue,
+
+        TryCallList,
+        FuncList,
+        EndFunc,
 
         TryCCall,
         Catch,
