@@ -340,6 +340,25 @@ namespace ERBPP
             {
                 return new Token { Type = LineType.Label };
             }
+            else if (IsSpBlockStart(ss.Current))
+            {
+                Consume('[');
+                var ident = GetIdent();
+                switch (ident.ToUpper())
+                {
+                    case "SKIPSTART":
+                    case "SKIPEND":
+                    case "IF":
+                    case "ELSEIF":
+                    case "ELSE":
+                    case "ENDIF":
+                    case "IF_DEBUG":
+                    case "IF_NDEBUG":
+                        return new Token { Type = LineType.SpBlock };
+                    default:
+                        throw new FormatException($"unknown spblock: {ident}");
+                }
+            }
             else if (IsIncr(ss.Current))
             {
                 if (IsIncr(ss.Peek(1)))
@@ -668,6 +687,8 @@ namespace ERBPP
         private static bool IsIdentChar(char c) => c == '_' || Char.IsLetterOrDigit(c);
         private static bool IsIncr(char c) => c == '+';
         private static bool IsDecr(char c) => c == '-';
+        private static bool IsSpBlockStart(char c) => c == '[';
+        private static bool IsSpBlockEnd(char c) => c == ']';
         //private static bool IsIdentStart(char c) => Char.IsLetter(c);
 
         //private Token Ident() => throw new NotImplementedException();
@@ -714,6 +735,11 @@ namespace ERBPP
         /// ラベル行
         /// </summary>
         Label,
+
+        /// <summary>
+        /// 特殊ブロック [SKIPSTART][SKIPEND]など https://ja.osdn.net/projects/emuera/wiki/exfunc#h3-.E7.89.B9.E6.AE.8A.E3.81.AA.E3.83.96.E3.83.AD.E3.83.83.E3.82.AF.E3.82.92.E8.A1.A8.E3.81.99.E8.A1.8C
+        /// </summary>
+        SpBlock,
 
         VariableDefinition,
 
