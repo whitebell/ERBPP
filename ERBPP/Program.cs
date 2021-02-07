@@ -60,6 +60,8 @@ namespace ERBPP
                     case LineType.Repeat:
                     case LineType.While:
                     case LineType.For:
+                    case LineType.Do:
+                    case LineType.TryCCall:
                     case LineType.SelectCase:
                     case LineType.PrintData:
                         sw.Write(new string('\t', curIndentLv++));
@@ -67,7 +69,8 @@ namespace ERBPP
                         break;
                     case LineType.ElseIf:
                     case LineType.Else:
-                    case LineType.CaseElse:
+                    case LineType.Catch:
+                    //case LineType.CaseElse:
                         sw.Write(new string('\t', curIndentLv - 1));
                         sw.WriteLine(l);
                         break;
@@ -75,13 +78,16 @@ namespace ERBPP
                     case LineType.Rend:
                     case LineType.Wend:
                     case LineType.Next:
+                    case LineType.Loop:
+                    case LineType.EndCatch:
                     case LineType.EndData:
                         sw.Write(new string('\t', --curIndentLv));
                         sw.WriteLine(l);
                         break;
                     case LineType.Case:
+                    case LineType.CaseElse:
                         if (prevType == LineType.SelectCase)
-                            sw.Write(new string('\t', curIndentLv++));
+                            sw.Write(new string('\t', curIndentLv++)); // LineType.CaseElseでここにくるのは正気じゃないと思うが、実例があるのでしょうがない。eratohoJ+ REVMODE.ERB
                         else
                             sw.Write(new string('\t', curIndentLv - 1));
                         sw.WriteLine(l);
@@ -103,48 +109,78 @@ namespace ERBPP
 
                     case LineType.Comment:
                     case LineType.StartRegionComment:
-                        var lst = new List<(LineType, string)> { (t.Type, l) };
-                        string nl;
-                        LineType nextType = LineType.Unknown;
-                        while ((nl = sr.ReadLine()?.TrimStart()) is not null)
                         {
-                            var nt = new PseudoLexer(nl).GetToken();
-                            switch (nt.Type)
+                            var lst = new List<(LineType, string)> { (t.Type, l) };
+                            string nl;
+                            LineType nextType = LineType.Unknown;
+                            while ((nl = sr.ReadLine()?.TrimStart()) is not null)
                             {
-                                case LineType.Blank:
-                                case LineType.Comment:
-                                case LineType.StartRegionComment:
-                                case LineType.EndRegionComment:
-                                    lst.Add((nt.Type, nl));
+                                var nt = new PseudoLexer(nl).GetToken();
+                                switch (nt.Type)
+                                {
+                                    case LineType.Blank:
+                                    case LineType.Comment:
+                                    case LineType.StartRegionComment:
+                                    case LineType.EndRegionComment:
+                                        lst.Add((nt.Type, nl));
+                                        break;
+                                    default:
+                                        nextType = nt.Type;
+                                        goto BREAK;
+                                }
+                            }
+                        BREAK:
+                            switch (nextType)
+                            {
+                                case LineType.ElseIf:
+                                case LineType.Else:
+                                case LineType.Case:
+                                case LineType.CaseElse:
+                                case LineType.EndSelect:
+                                    foreach (var e in lst)
+                                    {
+                                        if (e.Item1 == LineType.Blank)
+                                        {
+                                            sw.WriteLine();
+                                        }
+                                        else
+                                        {
+                                            var indentLv = (nextType == LineType.Case || nextType == LineType.CaseElse) && prevType == LineType.SelectCase ? curIndentLv : Math.Max(0, curIndentLv - 1);
+                                            switch (e.Item1)
+                                            {
+                                                case LineType.StartRegionComment:
+                                                    regionStack.Push(indentLv);
+                                                    sw.Write(new string('\t', indentLv));
+                                                    sw.WriteLine(e.Item2);
+                                                    break;
+                                                case LineType.EndRegionComment:
+                                                    {
+                                                        if (!regionStack.TryPop(out var res))
+                                                            throw new FormatException("region/endregion stack err.");
+                                                        else
+                                                            sw.Write(new string('\t', res));
+                                                    }
+                                                    sw.WriteLine(e.Item2);
+                                                    break;
+                                                default:
+                                                    sw.Write(new string('\t', indentLv));
+                                                    sw.WriteLine(e.Item2);
+                                                    break;
+                                            }
+                                        }
+                                    }
                                     break;
                                 default:
-                                    nextType = nt.Type;
-                                    goto BREAK;
-                            }
-                        }
-                    BREAK:
-                        switch (nextType)
-                        {
-                            case LineType.ElseIf:
-                            case LineType.Else:
-                            case LineType.Case:
-                            case LineType.CaseElse:
-                            case LineType.Repeat:
-                            case LineType.EndSelect:
-                                foreach (var e in lst)
-                                {
-                                    if (e.Item1 == LineType.Blank)
+                                    foreach (var e in lst)
                                     {
-                                        sw.WriteLine();
-                                    }
-                                    else
-                                    {
-                                        var indentLv = nextType == LineType.Case && prevType == LineType.SelectCase ? curIndentLv : Math.Max(0, curIndentLv - 1);
                                         switch (e.Item1)
                                         {
+                                            case LineType.Blank:
+                                                sw.WriteLine();
+                                                break;
                                             case LineType.StartRegionComment:
-                                                regionStack.Push(indentLv);
-                                                sw.Write(new string('\t', indentLv));
+                                                regionStack.Push(curIndentLv);
+                                                sw.Write(new string('\t', curIndentLv));
                                                 sw.WriteLine(e.Item2);
                                                 break;
                                             case LineType.EndRegionComment:
@@ -157,44 +193,15 @@ namespace ERBPP
                                                 sw.WriteLine(e.Item2);
                                                 break;
                                             default:
-                                                sw.Write(new string('\t', indentLv));
+                                                sw.Write(new string('\t', curIndentLv));
                                                 sw.WriteLine(e.Item2);
                                                 break;
                                         }
                                     }
-                                }
                                     break;
-                            default:
-                                foreach (var e in lst)
-                                {
-                                    switch (e.Item1)
-                                    {
-                                        case LineType.Blank:
-                                            sw.WriteLine();
-                                            break;
-                                        case LineType.StartRegionComment:
-                                            regionStack.Push(curIndentLv);
-                                            sw.Write(new string('\t', curIndentLv));
-                                            sw.WriteLine(e.Item2);
-                                            break;
-                                        case LineType.EndRegionComment:
-                                            {
-                                                if (!regionStack.TryPop(out var res))
-                                                    throw new FormatException("region/endregion stack err.");
-                                                else
-                                                    sw.Write(new string('\t', res));
-                                            }
-                                            sw.WriteLine(e.Item2);
-                                            break;
-                                        default:
-                                            sw.Write(new string('\t', curIndentLv));
-                                            sw.WriteLine(e.Item2);
-                                            break;
-                                    }
-                                }
-                                break;
+                            }
+                            l = nl;
                         }
-                        l = nl;
                         goto REDO;
 
                     default:
@@ -358,11 +365,24 @@ namespace ERBPP
                     case "WEND":
                         return new Token { Type = LineType.Wend };
 
+                    case "DO":
+                        return new Token { Type = LineType.Do };
+                    case "LOOP":
+                        return new Token { Type = LineType.Loop };
+
                     case "BREAK":
                         return new Token { Type = LineType.Break };
 
                     case "CONTINUE":
                         return new Token { Type = LineType.Continue };
+
+                    case "TRYCCALL":
+                    case "TRYCCALLFORM":
+                        return new Token { Type = LineType.TryCCall };
+                    case "CATCH":
+                        return new Token { Type = LineType.Catch };
+                    case "ENDCATCH":
+                        return new Token { Type = LineType.EndCatch };
 
                     case "BEGIN":
                         return new Token { Type = LineType.Begin };
@@ -405,6 +425,7 @@ namespace ERBPP
                     case "ARRAYREMOVE":
                     case "ARRAYSHIFT":
                     case "BAR":
+                    case "CHKDATA":
                     case "CLEARBIT":
                     case "CLEARLINE":
                     case "CSVABL":
@@ -413,16 +434,20 @@ namespace ERBPP
                     case "CSVNAME":
                     case "CUSTOMDRAWLINE":
                     case "DELCHARA":
+                    case "DOTRAIN":
                     case "DRAWLINE":
                     case "EXISTCSV":
                     case "FONTBOLD":
                     case "FONTREGULAR":
+                    case "FONTSTYLE":
                     case "GETBIT":
                     case "GETCHARA":
                     case "GETPALAMLV":
                     case "INPUT":
                     case "INPUTS":
                     case "INVERTBIT":
+                    case "LIMIT":
+                    case "LOADDATA":
                     case "LOADGAME":
                     case "LOADGLOBAL":
                     case "ONEINPUT":
@@ -450,6 +475,7 @@ namespace ERBPP
                     case "PRINTFORMDW":
                     case "PRINTFORMS":
                     case "PRINTFORMW":
+                    case "PRINT_SHOPITEM":
                     case "PUTFORM":
                     case "REDRAW":
                     case "REPLACE":
@@ -517,6 +543,7 @@ namespace ERBPP
                     case "NEXTCOM":
                     case "NOWEX":
                     case "PALAM":
+                    case "PALAMLV":
                     case "PBAND":
                     case "PREVCOM":
                     case "RELATION":
@@ -649,9 +676,16 @@ namespace ERBPP
         While,
         Wend,
 
+        Do,
+        Loop,
+
         Break,
 
         Continue,
+
+        TryCCall,
+        Catch,
+        EndCatch,
 
         Call,
 
