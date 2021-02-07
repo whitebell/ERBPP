@@ -99,12 +99,28 @@ namespace ERBPP
                         break;
 
                     case LineType.Sif:
-                        sw.Write(new string('\t', curIndentLv));
-                        sw.WriteLine(l);
-                        if ((l = sr.ReadLine()?.TrimStart()) is null)
-                            throw new FormatException("last line sif");
-                        sw.Write(new string('\t', curIndentLv + 1));
-                        sw.WriteLine(l);
+                        {
+                            sw.Write(new string('\t', curIndentLv));
+                            sw.WriteLine(l);
+                            l = sr.ReadLine()?.TrimStart();
+                            if (l is null)
+                                throw new FormatException("last line sif");
+
+                            // eratohoJ+ COMF140.ERB SIFの次にコメント行。しぬべき。
+                            var lst = new List<string>();
+                            do
+                            {
+                                lst.Add(l);
+                                t = new PseudoLexer(l).GetToken();
+                                if (t.Type != LineType.Comment)
+                                    break;
+                            } while ((l = sr.ReadLine()?.TrimStart()) is not null);
+                            foreach (var e in lst)
+                            {
+                                sw.Write(new string('\t', curIndentLv + 1));
+                                sw.WriteLine(e);
+                            }
+                        }
                         break;
 
                     case LineType.Comment:
