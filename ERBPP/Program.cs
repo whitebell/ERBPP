@@ -409,6 +409,7 @@ namespace ERBPP
                     case "CALL":
                     case "CALLF":
                     case "CALLFORM":
+                    case "CALLTRAIN": //本来分けたほうがいいと思うけど、インデント修正するだけならいらない
                     case "TRYCALL":
                     case "TRYCALLFORM":
                         return new Token { Type = LineType.Call };
@@ -422,6 +423,7 @@ namespace ERBPP
 
                     case "RETURN":
                     case "RETURNF":
+                    case "RETURNFORM":
                         return new Token { Type = LineType.Return };
 
                     case "THROW":
@@ -438,6 +440,7 @@ namespace ERBPP
 
                     case "ADDCHARA":
                     case "ADDSPCHARA":
+                    case "ADDVOIDCHARA":
                     case "ARRAYREMOVE":
                     case "ARRAYSHIFT":
                     case "BAR":
@@ -490,8 +493,14 @@ namespace ERBPP
                     case "PRINTFORMLC":
                     case "PRINTFORMDW":
                     case "PRINTFORMS":
+                    case "PRINTFORMSL":
                     case "PRINTFORMW":
+                    case "PRINT_ABL":
+                    case "PRINT_EXP":
+                    case "PRINT_ITEM":
+                    case "PRINT_MARK":
                     case "PRINT_SHOPITEM":
+                    case "PRINT_TALENT":
                     case "PUTFORM":
                     case "REDRAW":
                     case "REPLACE":
@@ -507,7 +516,9 @@ namespace ERBPP
                     case "SKIPDISP":
                     case "SORTCHARA":
                     case "SPLIT":
+                    case "STRLENFORM":
                     case "STRLENS":
+                    case "SUBSTRING":
                     case "SWAP":
                     case "SWAPCHARA":
                     case "TIMES":
@@ -541,6 +552,7 @@ namespace ERBPP
                     case "DOWN":
                     case "DOWNBASE":
                     case "EJAC":
+                    case "EQUIP":
                     case "EX":
                     case "EXP":
                     case "FLAG":
@@ -558,6 +570,7 @@ namespace ERBPP
                     case "MONEY":
                     case "NAME":
                     case "NEXTCOM":
+                    case "NO":
                     case "NOWEX":
                     case "PALAM":
                     case "PALAMLV":
