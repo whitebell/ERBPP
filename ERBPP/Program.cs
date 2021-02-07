@@ -548,6 +548,7 @@ namespace ERBPP
                     case "PRINT_EXP":
                     case "PRINT_ITEM":
                     case "PRINT_MARK":
+                    case "PRINT_PALAM":
                     case "PRINT_SHOPITEM":
                     case "PRINT_TALENT":
                     case "PUTFORM":
