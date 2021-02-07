@@ -508,6 +508,7 @@ namespace ERBPP
                     case "SORTCHARA":
                     case "SPLIT":
                     case "STRLENS":
+                    case "SWAP":
                     case "SWAPCHARA":
                     case "TIMES":
                     case "TINPUT":
