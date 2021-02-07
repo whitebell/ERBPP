@@ -340,6 +340,36 @@ namespace ERBPP
             {
                 return new Token { Type = LineType.Label };
             }
+            else if (IsIncr(ss.Current))
+            {
+                if (IsIncr(ss.Peek(1)))
+                {
+                    Consume('+');
+                    Consume('+');
+                    SkipSpace();
+                    var t = GetToken();
+                    if (t.Type == LineType.Variable)
+                        return new Token { Type = LineType.Variable };
+                    else
+                        throw new FormatException("incr op. + nonvariable");
+                }
+                throw new FormatException($"can't parse. {ss.RawString}");
+            }
+            else if (IsDecr(ss.Current))
+            {
+                if (IsDecr(ss.Peek(1)))
+                {
+                    Consume('-');
+                    Consume('-');
+                    SkipSpace();
+                    var t = GetToken();
+                    if (t.Type == LineType.Variable)
+                        return new Token { Type = LineType.Variable };
+                    else
+                        throw new FormatException("incr op. + nonvariable");
+                }
+                throw new FormatException($"can't parse. {ss.RawString}");
+            }
             else
             {
                 var ident = GetIdent().ToUpper();
@@ -636,6 +666,8 @@ namespace ERBPP
         private static bool IsLabelStart(char c) => c == '$';
         private static bool IsIdentCharFirst(char c) => c == '_' || Char.IsLetter(c);
         private static bool IsIdentChar(char c) => c == '_' || Char.IsLetterOrDigit(c);
+        private static bool IsIncr(char c) => c == '+';
+        private static bool IsDecr(char c) => c == '-';
         //private static bool IsIdentStart(char c) => Char.IsLetter(c);
 
         //private Token Ident() => throw new NotImplementedException();
