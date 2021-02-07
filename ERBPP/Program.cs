@@ -622,7 +622,7 @@ namespace ERBPP
                     default:
                         if (variable.Contains(ident))
                             return new Token { Type = LineType.Variable };
-                        throw new FormatException($"unknown ident name ({ident})");
+                        throw new FormatException($"unknown ident name ({(String.IsNullOrWhiteSpace(ident) ? ss.RawString : ident)})");
                         //return new Token { Type = LineType.ErhUserDefVariable }; // ERHで定義されたグローバルなUDVだとここに来る
                         //現状では上のcaseで判定していない関数/変数があるのでそれもここにきてしまう。
                 }
