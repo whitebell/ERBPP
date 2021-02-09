@@ -94,7 +94,7 @@ namespace ERBPP
                         sw.WriteLine(l);
                         break;
                     case LineType.EndSelect:
-                        curIndentLv -= 2;
+                        curIndentLv -= prevType == LineType.SelectCase ? 1 : 2; // eraTW ERB/MOVEMENTS/物件関連/JOB_MANAGE.ERB CASE,CASEELSEがない空のSELECTCASE～ENDSELECT。正気じゃない。
                         sw.Write(new string('\t', curIndentLv));
                         sw.WriteLine(l);
                         break;
