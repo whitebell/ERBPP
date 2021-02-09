@@ -392,8 +392,8 @@ namespace ERBPP
             }
             else
             {
-                var ident = GetIdent().ToUpper();
-                switch (ident)
+                var ident = GetIdent(); // 小文字のユーザ定義変数があった。ここで大文字にしてしまうとdefaultのUDVを見るところで誤って見落としてしまう。辞書に入れる時点で全部大文字にしてしまうか。
+                switch (ident.ToUpper())
                 {
                     case "SIF":
                         return new Token { Type = LineType.Sif };
