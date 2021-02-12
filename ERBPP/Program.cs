@@ -534,6 +534,8 @@ namespace ERBPP
                     case "ARRAYREMOVE":
                     case "ARRAYSHIFT":
                     case "ARRAYSORT":
+                    case "ASSERT":
+                    case "AWAIT":
                     case "BAR":
                     case "BARSTR":
                     case "CALLEVENT":
@@ -553,6 +555,7 @@ namespace ERBPP
                     case "CHKFONT":
                     case "CLEARBIT":
                     case "CLEARLINE":
+                    case "CLEARTEXTBOX":
                     case "CLIENTHEIGHT ":
                     case "CLIENTWIDTH ":
                     case "CMATCH":
@@ -582,6 +585,7 @@ namespace ERBPP
                     case "CVARSET":
                     case "DEBUGCLEAR":
                     case "DEBUGPRINT":
+                    case "DEBUGPRINTFORM":
                     case "DEBUGPRINTFORML":
                     case "DEBUGPRINTL":
                     case "DELALLCHARA":
@@ -801,6 +805,7 @@ namespace ERBPP
                     case "SAVEGLOBAL":
                     case "SAVENOS":
                     case "SAVETEXT":
+                    case "SETANIMETIMER":
                     case "SETBGCOLOR":
                     case "SETBGCOLORBYNAME":
                     case "SETBIT":
@@ -824,6 +829,7 @@ namespace ERBPP
                     case "SPRITESETPOS":
                     case "SPRITEWIDTH":
                     case "SQRT":
+                    case "STOPCALLTRAIN":
                     case "STRCOUNT":
                     case "STRFIND":
                     case "STRFINDU":
@@ -852,6 +858,9 @@ namespace ERBPP
                     case "TOLOWER":
                     case "TONEINPUT":
                     case "TONEINPUTS":
+                    case "TOOLTIP_SETCOLOR":
+                    case "TOOLTIP_SETDELAY":
+                    case "TOOLTIP_SETDURATION":
                     case "TOSTR":
                     case "TOUPPER ":
                     case "TOUPPER":
