@@ -62,7 +62,11 @@ namespace ERBPP
                     case LineType.For:
                     case LineType.Do:
                     case LineType.TryCallList:
+                    case LineType.TryGotoList:
+                    case LineType.TryJumpList:
                     case LineType.TryCCall:
+                    case LineType.TryCGoto:
+                    case LineType.TryCJump:
                     case LineType.SelectCase:
                     case LineType.PrintData:
                     case LineType.StrData:
@@ -455,14 +459,24 @@ namespace ERBPP
 
                     case "TRYCALLLIST":
                         return new Token { Type = LineType.TryCallList };
+                    case "TRYGOTOLIST":
+                        return new Token { Type = LineType.TryGotoList };
+                    case "TRYJUMPLIST":
+                        return new Token { Type = LineType.TryJumpList };
                     case "FUNC":
-                        return new Token { Type = LineType.FuncList };
+                        return new Token { Type = LineType.Func };
                     case "ENDFUNC":
                         return new Token { Type = LineType.EndFunc };
 
                     case "TRYCCALL":
                     case "TRYCCALLFORM":
                         return new Token { Type = LineType.TryCCall };
+                    case "TRYCGOTO":
+                    case "TRYCGOTOFORM":
+                        return new Token { Type = LineType.TryCGoto };
+                    case "TRYCJUMP":
+                    case "TRYCJUMPFORM":
+                        return new Token { Type = LineType.TryCJump };
                     case "CATCH":
                         return new Token { Type = LineType.Catch };
                     case "ENDCATCH":
@@ -1084,10 +1098,14 @@ namespace ERBPP
         Continue,
 
         TryCallList,
-        FuncList,
+        TryGotoList,
+        TryJumpList,
+        Func,
         EndFunc,
 
         TryCCall,
+        TryCGoto,
+        TryCJump,
         Catch,
         EndCatch,
 
