@@ -472,16 +472,20 @@ namespace ERBPP
                     case "CALLF":
                     case "CALLFORM":
                     case "CALLFORMF":
-                    case "CALLTRAIN": //本来分けたほうがいいと思うけど、インデント修正するだけならいらない
                     case "TRYCALL":
                     case "TRYCALLFORM":
                         return new Token { Type = LineType.Call };
 
                     case "JUMP":
                     case "JUMPFORM":
+                    case "TRYJUMP":
+                    case "TRYJUMPFORM":
                         return new Token { Type = LineType.Jump };
 
                     case "GOTO":
+                    case "GOTOFORM":
+                    case "TRYGOTO":
+                    case "TRYGOTOFORM":
                         return new Token { Type = LineType.Goto };
 
                     case "RETURN":
@@ -496,6 +500,9 @@ namespace ERBPP
                     case "PRINTDATAD":
                     case "PRINTDATADL":
                     case "PRINTDATADW":
+                    case "PRINTDATAK":
+                    case "PRINTDATAKL":
+                    case "PRINTDATAKW":
                     case "PRINTDATAL":
                     case "PRINTDATAW":
                         return new Token { Type = LineType.PrintData };
@@ -505,102 +512,271 @@ namespace ERBPP
                     case "ENDDATA":
                         return new Token { Type = LineType.EndData };
 
+                    case "ABS":
                     case "ADDCHARA":
                     case "ADDCOPYCHARA":
+                    case "ADDDEFCHARA":
                     case "ADDSPCHARA":
                     case "ADDVOIDCHARA":
                     case "ALIGNMENT":
+                    case "ALLSAMES":
                     case "ARRAYCOPY":
+                    case "ARRAYMSORT":
                     case "ARRAYREMOVE":
                     case "ARRAYSHIFT":
                     case "ARRAYSORT":
                     case "BAR":
+                    case "BARSTR":
+                    case "CALLEVENT":
+                    case "CALLTRAIN":
+                    case "CBGCLEAR":
+                    case "CBGCLEARBUTTON":
+                    case "CBGREMOVEBMAP":
+                    case "CBGREMOVERANGE":
+                    case "CBGSETBMAPG":
+                    case "CBGSETBUTTONSPRITE":
+                    case "CBGSETG":
+                    case "CBGSETSPRITE":
+                    case "CBRT":
+                    case "CHARATU":
                     case "CHKCHARADATA":
                     case "CHKDATA":
+                    case "CHKFONT":
                     case "CLEARBIT":
                     case "CLEARLINE":
-                    case "CURRENTREDRAW":
+                    case "CLIENTHEIGHT ":
+                    case "CLIENTWIDTH ":
+                    case "CMATCH":
+                    case "COLOR_FROMNAME":
+                    case "COLOR_FROMRGB":
+                    case "CONVERT":
+                    case "COPYCHARA":
                     case "CSVABL":
+                    case "CSVBASE":
                     case "CSVCALLNAME":
+                    case "CSVCFLAG":
                     case "CSVCSTR":
+                    case "CSVEQUIP":
+                    case "CSVEXP":
+                    case "CSVJUEL":
+                    case "CSVJULE":
+                    case "CSVMARK":
+                    case "CSVMASTERNAME":
                     case "CSVNAME":
+                    case "CSVNICKNAME":
+                    case "CSVRELATION":
+                    case "CSVTALENT":
+                    case "CUPCHECK":
+                    case "CURRENTALIGN":
+                    case "CURRENTREDRAW":
                     case "CUSTOMDRAWLINE":
                     case "CVARSET":
                     case "DEBUGCLEAR":
                     case "DEBUGPRINT":
                     case "DEBUGPRINTFORML":
                     case "DEBUGPRINTL":
+                    case "DELALLCHARA":
                     case "DELCHARA":
+                    case "DELDATA":
                     case "DOTRAIN":
                     case "DRAWLINE":
                     case "DRAWLINEFORM":
                     case "DUMPRAND":
+                    case "ENCODETOUNI":
+                    case "ENDNOSKIP":
+                    case "ESCAPE":
                     case "EXISTCSV":
+                    case "EXPONENT":
+                    case "FIND_CHARADATA":
                     case "FINDCHARA":
+                    case "FINDELEMENT ":
+                    case "FINDELEMENT":
+                    case "FINDLASTCHARA":
+                    case "FINDLASTELEMENT ":
+                    case "FINDLASTELEMENT":
                     case "FONTBOLD":
                     case "FONTITALIC":
                     case "FONTREGULAR":
                     case "FONTSTYLE":
+                    case "FORCEKANA":
                     case "FORCEWAIT":
+                    case "GCLEAR":
+                    case "GCREATE":
+                    case "GCREATED":
+                    case "GCREATEFROMFILE":
+                    case "GDISPOSE":
+                    case "GDRAWG":
+                    case "GDRAWGWITHMASK":
+                    case "GDRAWSPRITE":
+                    case "GETBGCOLOR":
                     case "GETBIT":
                     case "GETCHARA":
+                    case "GETCOLOR":
+                    case "GETCONFIG":
+                    case "GETCONFIGS":
+                    case "GETDEFBGCOLOR":
                     case "GETDEFCOLOR":
+                    case "GETEXPLV":
+                    case "GETFOCUSCOLOR":
                     case "GETFONT":
+                    case "GETKEY":
+                    case "GETKEYTRIGGERED":
+                    case "GETLINESTR":
+                    case "GETMILLISECOND":
+                    case "GETNUM":
                     case "GETPALAMLV":
+                    case "GETSECOND":
+                    case "GETSTYLE":
                     case "GETTIME":
+                    case "GETTIMES":
+                    case "GFILLRECTANGLE":
+                    case "GGETCOLOR":
+                    case "GHEIGHT":
+                    case "GLOAD":
+                    case "GROUPMATCH":
+                    case "GSAVE":
+                    case "GSETBRUSH":
+                    case "GSETCOLOR":
+                    case "GSETFONT":
+                    case "GSETPEN":
+                    case "GWIDTH":
+                    case "HTML_ESCAPE":
+                    case "HTML_GETPRINTEDSTR":
+                    case "HTML_POPPRINTINGSTR":
                     case "HTML_PRINT":
+                    case "HTML_TAGSPLIT":
+                    case "HTML_TOPLAINTEXT":
                     case "INITRAND":
                     case "INPUT":
+                    case "INPUTMOUSEKEY":
                     case "INPUTS":
+                    case "INRANGE":
+                    case "INRANGEARRAY":
+                    case "INRANGECARRAY":
                     case "INVERTBIT":
+                    case "ISACTIVE":
+                    case "ISNUMERIC":
+                    case "ISSKIP":
                     case "LIMIT":
+                    case "LINEISEMPTY":
                     case "LOADCHARA":
                     case "LOADDATA":
                     case "LOADGAME":
                     case "LOADGLOBAL":
+                    case "LOADTEXT":
+                    case "LOG":
+                    case "LOG10":
+                    case "MATCH":
+                    case "MAX":
+                    case "MAXARRAY":
+                    case "MAXCARRAY":
+                    case "MESSKIP":
+                    case "MIN":
+                    case "MINARRAY":
+                    case "MINCARRAY":
+                    case "MONEYSTR":
+                    case "MOUSESKIP":
+                    case "MOUSEX":
+                    case "MOUSEY":
+                    case "NOSAMES":
+                    case "NOSKIP":
                     case "ONEINPUT":
                     case "ONEINPUTS":
+                    case "OUTPUTLOG":
+                    case "PICKUPCHARA":
                     case "POWER":
                     case "PRINT":
-                    case "PRINTBUTTON":
-                    case "PRINTC":
-                    case "PRINTCD":
-                    case "PRINTD":
-                    case "PRINTDL":
-                    case "PRINTDW":
-                    case "PRINTL":
-                    case "PRINTLC":
-                    case "PRINTS":
-                    case "PRINTSD":
-                    case "PRINTSINGLEFORM":
-                    case "PRINTSINGLEFORMS":
-                    case "PRINTSL":
-                    case "PRINTSW":
-                    case "PRINTV":
-                    case "PRINTVL":
-                    case "PRINTW":
-                    case "PRINTFORM":
-                    case "PRINTFORMC":
-                    case "PRINTFORMCD":
-                    case "PRINTFORMD":
-                    case "PRINTFORMDL":
-                    case "PRINTFORMKW":
-                    case "PRINTFORML":
-                    case "PRINTFORMLC":
-                    case "PRINTFORMDW":
-                    case "PRINTFORMS":
-                    case "PRINTFORMSL":
-                    case "PRINTFORMW":
-                    case "PRINTPLAIN":
-                    case "PRINTPLAINFORM":
                     case "PRINT_ABL":
                     case "PRINT_EXP":
+                    case "PRINT_IMG":
                     case "PRINT_ITEM":
                     case "PRINT_MARK":
                     case "PRINT_PALAM":
+                    case "PRINT_RECT":
                     case "PRINT_SHOPITEM":
+                    case "PRINT_SPACE":
                     case "PRINT_TALENT":
+                    case "PRINTBUTTON":
+                    case "PRINTBUTTONC":
+                    case "PRINTBUTTONLC":
+                    case "PRINTC":
+                    case "PRINTCD":
+                    case "PRINTCK":
+                    case "PRINTCLENGTH":
+                    case "PRINTCPERLINE":
+                    case "PRINTD":
+                    case "PRINTDL":
+                    case "PRINTDW":
+                    case "PRINTFORM":
+                    case "PRINTFORMC":
+                    case "PRINTFORMCD":
+                    case "PRINTFORMCK":
+                    case "PRINTFORMD":
+                    case "PRINTFORMDL":
+                    case "PRINTFORMDW":
+                    case "PRINTFORMK":
+                    case "PRINTFORMKL":
+                    case "PRINTFORMKW":
+                    case "PRINTFORML":
+                    case "PRINTFORMLC":
+                    case "PRINTFORMLCD":
+                    case "PRINTFORMLCK":
+                    case "PRINTFORMS":
+                    case "PRINTFORMSD":
+                    case "PRINTFORMSDL":
+                    case "PRINTFORMSDW":
+                    case "PRINTFORMSK":
+                    case "PRINTFORMSKL":
+                    case "PRINTFORMSKW":
+                    case "PRINTFORMSL":
+                    case "PRINTFORMSW":
+                    case "PRINTFORMW":
+                    case "PRINTK":
+                    case "PRINTKL":
+                    case "PRINTKW":
+                    case "PRINTL":
+                    case "PRINTLC":
+                    case "PRINTLCD":
+                    case "PRINTLCK":
+                    case "PRINTPLAIN":
+                    case "PRINTPLAINFORM":
+                    case "PRINTS":
+                    case "PRINTSD":
+                    case "PRINTSDL":
+                    case "PRINTSDW":
+                    case "PRINTSINGLE":
+                    case "PRINTSINGLED":
+                    case "PRINTSINGLEFORM":
+                    case "PRINTSINGLEFORMD":
+                    case "PRINTSINGLEFORMK":
+                    case "PRINTSINGLEFORMS":
+                    case "PRINTSINGLEFORMSD":
+                    case "PRINTSINGLEFORMSK":
+                    case "PRINTSINGLEK":
+                    case "PRINTSINGLES":
+                    case "PRINTSINGLESD":
+                    case "PRINTSINGLESK":
+                    case "PRINTSINGLEV":
+                    case "PRINTSINGLEVD":
+                    case "PRINTSINGLEVK":
+                    case "PRINTSK":
+                    case "PRINTSKL":
+                    case "PRINTSKW":
+                    case "PRINTSL":
+                    case "PRINTSW":
+                    case "PRINTV":
+                    case "PRINTVD":
+                    case "PRINTVDL":
+                    case "PRINTVDW":
+                    case "PRINTVK":
+                    case "PRINTVKL":
+                    case "PRINTVKW":
+                    case "PRINTVL":
+                    case "PRINTVW":
+                    case "PRINTW":
                     case "PUTFORM":
+                    case "QUIT":
+                    case "RAND":
                     case "RANDOMIZE":
                     case "REDRAW":
                     case "REPLACE":
@@ -608,32 +784,75 @@ namespace ERBPP
                     case "RESETBGCOLOR":
                     case "RESETCOLOR":
                     case "RESETDATA":
+                    case "RESETGLOBAL":
                     case "REUSELASTLINE":
                     case "SAVECHARA":
+                    case "SAVEDATA":
                     case "SAVEGAME":
                     case "SAVEGLOBAL":
+                    case "SAVENOS":
+                    case "SAVETEXT":
                     case "SETBGCOLOR":
+                    case "SETBGCOLORBYNAME":
+                    case "SETBIT":
                     case "SETCOLOR":
+                    case "SETCOLORBYNAME":
                     case "SETFONT":
+                    case "SIGN":
                     case "SKIPDISP":
                     case "SORTCHARA":
                     case "SPLIT":
+                    case "SPRITEANIMEADDFRAME":
+                    case "SPRITEANIMECREATE":
+                    case "SPRITECREATE":
+                    case "SPRITECREATED":
+                    case "SPRITEDISPOSE":
+                    case "SPRITEGETCOLOR":
+                    case "SPRITEHEIGHT":
+                    case "SPRITEMOVE":
+                    case "SPRITEPOSX":
+                    case "SPRITEPOSY":
+                    case "SPRITESETPOS":
+                    case "SPRITEWIDTH":
+                    case "SQRT":
+                    case "STRCOUNT":
                     case "STRFIND":
+                    case "STRFINDU":
+                    case "STRFORM":
+                    case "STRLEN":
                     case "STRLENFORM":
+                    case "STRLENFORMU":
                     case "STRLENS":
+                    case "STRLENSU":
+                    case "STRLENU":
                     case "SUBSTRING":
                     case "SUBSTRINGU":
+                    case "SUMARRAY":
+                    case "SUMCARRAY":
                     case "SWAP":
                     case "SWAPCHARA":
                     case "TIMES":
                     case "TINPUT":
+                    case "TINPUTS":
+                    case "TOFULL ":
+                    case "TOFULL":
+                    case "TOHALF ":
+                    case "TOHALF":
+                    case "TOINT":
+                    case "TOLOWER ":
+                    case "TOLOWER":
+                    case "TONEINPUT":
+                    case "TONEINPUTS":
+                    case "TOSTR":
+                    case "TOUPPER ":
+                    case "TOUPPER":
                     case "TWAIT":
+                    case "UNICODE":
                     case "UPCHECK":
-                    case "QUIT":
-                    case "SETBIT":
                     case "VARSET":
                     case "VARSIZE":
                     case "WAIT":
+                    case "WAITANYKEY":
                         return new Token { Type = LineType.BuiltinFunction };
 
                     case "MASTER":
