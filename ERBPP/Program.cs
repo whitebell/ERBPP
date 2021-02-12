@@ -467,6 +467,7 @@ namespace ERBPP
                     case "CALL":
                     case "CALLF":
                     case "CALLFORM":
+                    case "CALLFORMF":
                     case "CALLTRAIN": //本来分けたほうがいいと思うけど、インデント修正するだけならいらない
                     case "TRYCALL":
                     case "TRYCALLFORM":
@@ -488,6 +489,10 @@ namespace ERBPP
                         return new Token { Type = LineType.Throw };
 
                     case "PRINTDATA":
+                    case "PRINTDATAD":
+                    case "PRINTDATADL":
+                    case "PRINTDATADW":
+                    case "PRINTDATAL":
                     case "PRINTDATAW":
                         return new Token { Type = LineType.PrintData };
                     case "DATA":
@@ -497,33 +502,55 @@ namespace ERBPP
                         return new Token { Type = LineType.EndData };
 
                     case "ADDCHARA":
+                    case "ADDCOPYCHARA":
                     case "ADDSPCHARA":
                     case "ADDVOIDCHARA":
+                    case "ALIGNMENT":
+                    case "ARRAYCOPY":
                     case "ARRAYREMOVE":
                     case "ARRAYSHIFT":
+                    case "ARRAYSORT":
                     case "BAR":
+                    case "CHKCHARADATA":
                     case "CHKDATA":
                     case "CLEARBIT":
                     case "CLEARLINE":
+                    case "CURRENTREDRAW":
                     case "CSVABL":
                     case "CSVCALLNAME":
                     case "CSVCSTR":
                     case "CSVNAME":
                     case "CUSTOMDRAWLINE":
+                    case "CVARSET":
+                    case "DEBUGCLEAR":
+                    case "DEBUGPRINT":
+                    case "DEBUGPRINTFORML":
+                    case "DEBUGPRINTL":
                     case "DELCHARA":
                     case "DOTRAIN":
                     case "DRAWLINE":
+                    case "DRAWLINEFORM":
+                    case "DUMPRAND":
                     case "EXISTCSV":
+                    case "FINDCHARA":
                     case "FONTBOLD":
+                    case "FONTITALIC":
                     case "FONTREGULAR":
                     case "FONTSTYLE":
+                    case "FORCEWAIT":
                     case "GETBIT":
                     case "GETCHARA":
+                    case "GETDEFCOLOR":
+                    case "GETFONT":
                     case "GETPALAMLV":
+                    case "GETTIME":
+                    case "HTML_PRINT":
+                    case "INITRAND":
                     case "INPUT":
                     case "INPUTS":
                     case "INVERTBIT":
                     case "LIMIT":
+                    case "LOADCHARA":
                     case "LOADDATA":
                     case "LOADGAME":
                     case "LOADGLOBAL":
@@ -534,11 +561,15 @@ namespace ERBPP
                     case "PRINTBUTTON":
                     case "PRINTC":
                     case "PRINTCD":
+                    case "PRINTD":
+                    case "PRINTDL":
+                    case "PRINTDW":
                     case "PRINTL":
                     case "PRINTLC":
                     case "PRINTS":
                     case "PRINTSD":
                     case "PRINTSINGLEFORM":
+                    case "PRINTSINGLEFORMS":
                     case "PRINTSL":
                     case "PRINTSW":
                     case "PRINTV":
@@ -547,12 +578,17 @@ namespace ERBPP
                     case "PRINTFORM":
                     case "PRINTFORMC":
                     case "PRINTFORMCD":
+                    case "PRINTFORMD":
+                    case "PRINTFORMDL":
+                    case "PRINTFORMKW":
                     case "PRINTFORML":
                     case "PRINTFORMLC":
                     case "PRINTFORMDW":
                     case "PRINTFORMS":
                     case "PRINTFORMSL":
                     case "PRINTFORMW":
+                    case "PRINTPLAIN":
+                    case "PRINTPLAINFORM":
                     case "PRINT_ABL":
                     case "PRINT_EXP":
                     case "PRINT_ITEM":
@@ -561,12 +597,15 @@ namespace ERBPP
                     case "PRINT_SHOPITEM":
                     case "PRINT_TALENT":
                     case "PUTFORM":
+                    case "RANDOMIZE":
                     case "REDRAW":
                     case "REPLACE":
                     case "RESET_STAIN":
+                    case "RESETBGCOLOR":
                     case "RESETCOLOR":
                     case "RESETDATA":
                     case "REUSELASTLINE":
+                    case "SAVECHARA":
                     case "SAVEGAME":
                     case "SAVEGLOBAL":
                     case "SETBGCOLOR":
@@ -575,9 +614,11 @@ namespace ERBPP
                     case "SKIPDISP":
                     case "SORTCHARA":
                     case "SPLIT":
+                    case "STRFIND":
                     case "STRLENFORM":
                     case "STRLENS":
                     case "SUBSTRING":
+                    case "SUBSTRINGU":
                     case "SWAP":
                     case "SWAPCHARA":
                     case "TIMES":
@@ -601,7 +642,9 @@ namespace ERBPP
                     case "ASSIPLAY":
                     case "BASE":
                     case "MAXBASE":
+                    case "BOUGHT":
                     case "CALLNAME":
+                    case "CDFLAG":
                     case "CDOWN":
                     case "CFLAG":
                     case "COUNT":
@@ -614,6 +657,7 @@ namespace ERBPP
                     case "EQUIP":
                     case "EX":
                     case "EXP":
+                    case "EXPLV":
                     case "FLAG":
                     case "GLOBAL":
                     case "GLOBALS":
@@ -626,18 +670,23 @@ namespace ERBPP
                     case "LOCALS":
                     case "LOSEBASE":
                     case "MARK":
+                    case "MASTERNAME":
                     case "MONEY":
                     case "NAME":
                     case "NEXTCOM":
+                    case "NICKNAME":
                     case "NO":
+                    case "NOITEM":
                     case "NOWEX":
                     case "PALAM":
                     case "PALAMLV":
                     case "PBAND":
                     case "PREVCOM":
+                    case "RANDDATA":
                     case "RELATION":
                     case "RESULT":
                     case "RESULTS":
+                    case "SAVEDATA_TEXT":
                     case "SAVESTR":
                     case "SELECTCOM":
                     case "SOURCE":
@@ -650,6 +699,7 @@ namespace ERBPP
                     case "TIME":
                     case "TSTR":
                     case "UP":
+                    case "WINDOW_TITLE":
                     case "A":
                     case "B":
                     case "C":
@@ -676,6 +726,14 @@ namespace ERBPP
                     case "X":
                     case "Y":
                     case "Z":
+                    case "DA":
+                    case "DB":
+                    case "DC":
+                    case "DD":
+                    case "DE":
+                    case "DITEMTYPE":
+                    case "TA":
+                    case "TB":
                         return new Token { Type = LineType.Variable };
 
                     default:
