@@ -315,7 +315,11 @@ namespace ERBPP
                 Consume('#');
                 switch (GetIdent().ToUpper())
                 {
+                    case "ONLY":
                     case "FUNCTION":
+                    case "FUNCTIONS":
+                    case "LOCALSIZE":
+                    case "LOCALSSIZE":
                     case "LATER":
                     case "PRI":
                         return new Token { Type = LineType.Attribute };
