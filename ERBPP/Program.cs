@@ -329,6 +329,7 @@ namespace ERBPP
                                 SkipSpace();
                                 v = GetIdent();
                             }
+                            v = v.ToUpper(); //全部大文字にして登録する。eraTWアリス口上 日常系コマンドで大文字小文字の混乱がある。
                             if (!variable.Contains(v))
                                 variable.Add(v);
                             return new Token { Type = LineType.VariableDefinition };
@@ -678,7 +679,7 @@ namespace ERBPP
                         return new Token { Type = LineType.Variable };
 
                     default:
-                        if (variable.Contains(ident))
+                        if (variable.Contains(ident.ToUpper()))
                             return new Token { Type = LineType.Variable };
                         throw new FormatException($"unknown ident name ({(String.IsNullOrWhiteSpace(ident) ? ss.RawString : ident)})");
                         //return new Token { Type = LineType.ErhUserDefVariable }; // ERHで定義されたグローバルなUDVだとここに来る
