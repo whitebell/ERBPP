@@ -81,6 +81,7 @@ namespace ERBPP
                     case LineType.Loop:
                     case LineType.EndFunc:
                     case LineType.EndCatch:
+                    case LineType.EndList:
                     case LineType.EndData:
                         sw.Write(new string('\t', --curIndentLv));
                         sw.WriteLine(l);
@@ -91,6 +92,10 @@ namespace ERBPP
                             sw.Write(new string('\t', curIndentLv++)); // LineType.CaseElseでここにくるのは正気じゃないと思うが、実例があるのでしょうがない。eratohoJ+ REVMODE.ERB
                         else
                             sw.Write(new string('\t', curIndentLv - 1));
+                        sw.WriteLine(l);
+                        break;
+                    case LineType.DataList:
+                        sw.Write(new string('\t', curIndentLv++));
                         sw.WriteLine(l);
                         break;
                     case LineType.EndSelect:
@@ -506,6 +511,10 @@ namespace ERBPP
                     case "PRINTDATAL":
                     case "PRINTDATAW":
                         return new Token { Type = LineType.PrintData };
+                    case "DATALIST":
+                        return new Token { Type = LineType.DataList };
+                    case "ENDLIST":
+                        return new Token { Type = LineType.EndList };
                     case "DATA":
                     case "DATAFORM":
                         return new Token { Type = LineType.Data };
@@ -1085,6 +1094,8 @@ namespace ERBPP
         Throw,
 
         PrintData,
+        DataList,
+        EndList,
         Data,
         EndData,
 
