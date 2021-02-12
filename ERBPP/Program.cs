@@ -65,6 +65,7 @@ namespace ERBPP
                     case LineType.TryCCall:
                     case LineType.SelectCase:
                     case LineType.PrintData:
+                    case LineType.StrData:
                         sw.Write(new string('\t', curIndentLv++));
                         sw.WriteLine(l);
                         break;
@@ -511,6 +512,8 @@ namespace ERBPP
                     case "PRINTDATAL":
                     case "PRINTDATAW":
                         return new Token { Type = LineType.PrintData };
+                    case "STRDATA":
+                        return new Token { Type = LineType.StrData };
                     case "DATALIST":
                         return new Token { Type = LineType.DataList };
                     case "ENDLIST":
@@ -1103,6 +1106,7 @@ namespace ERBPP
         Throw,
 
         PrintData,
+        StrData,
         DataList,
         EndList,
         Data,
