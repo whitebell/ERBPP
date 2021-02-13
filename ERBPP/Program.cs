@@ -139,7 +139,7 @@ namespace ERBPP
                         {
                             var lst = new List<(LineType, string)> { (t.Type, l) };
                             string nl;
-                            LineType nextType = LineType.Unknown;
+                            var nextType = LineType.Unknown;
                             while ((nl = sr.ReadLine()?.TrimStart()) is not null)
                             {
                                 var nt = new PseudoLexer(nl).GetToken();
@@ -323,7 +323,8 @@ namespace ERBPP
             else if (IsAttributeStart(ss.Current))
             {
                 Consume('#');
-                switch (GetIdent().ToUpper())
+                var ident = GetIdent();
+                switch (ident.ToUpper())
                 {
                     case "ONLY":
                     case "FUNCTION":
@@ -337,13 +338,13 @@ namespace ERBPP
                     case "DIMS":
                         {
                             SkipSpace();
-                            var v = GetIdent();
-                            if (v.Equals("dynamic", StringComparison.OrdinalIgnoreCase))
+                            //全部大文字にして登録する。eraTWアリス口上 日常系コマンドで大文字小文字の混乱がある。
+                            var v = GetIdent().ToUpper();
+                            if (v == "DYNAMIC")
                             {
                                 SkipSpace();
-                                v = GetIdent();
+                                v = GetIdent().ToUpper();
                             }
-                            v = v.ToUpper(); //全部大文字にして登録する。eraTWアリス口上 日常系コマンドで大文字小文字の混乱がある。
                             if (!variable.Contains(v))
                                 variable.Add(v);
                             return new Token { Type = LineType.VariableDefinition };
@@ -359,7 +360,9 @@ namespace ERBPP
             else if (IsSpBlockStart(ss.Current))
             {
                 Consume('[');
+                SkipSpace();
                 var ident = GetIdent();
+                SkipSpace();
                 switch (ident.ToUpper())
                 {
                     case "SKIPSTART":
@@ -370,40 +373,32 @@ namespace ERBPP
                     case "ENDIF":
                     case "IF_DEBUG":
                     case "IF_NDEBUG":
-                        return new Token { Type = LineType.SpBlock };
+                        return IsSpBlockEnd(ss.Current) ? new Token { Type = LineType.SpBlock } : throw new FormatException($"unknown spblock: {ident}");
                     default:
                         throw new FormatException($"unknown spblock: {ident}");
                 }
             }
             else if (IsIncr(ss.Current))
             {
-                if (IsIncr(ss.Peek(1)))
-                {
-                    Consume('+');
-                    Consume('+');
-                    SkipSpace();
-                    var t = GetToken();
-                    if (t.Type == LineType.Variable)
-                        return new Token { Type = LineType.Variable };
-                    else
-                        throw new FormatException("incr op. + nonvariable");
-                }
-                throw new FormatException($"can't parse. {ss.RawString}");
+                if (!IsIncr(ss.Peek(1)))
+                    throw new FormatException($"can't parse. {ss.RawString}");
+
+                Consume('+');
+                Consume('+');
+                SkipSpace();
+                var t = GetToken();
+                return t.Type == LineType.Variable ? new Token { Type = LineType.Variable } : throw new FormatException("incr op. + nonvariable");
             }
             else if (IsDecr(ss.Current))
             {
-                if (IsDecr(ss.Peek(1)))
-                {
-                    Consume('-');
-                    Consume('-');
-                    SkipSpace();
-                    var t = GetToken();
-                    if (t.Type == LineType.Variable)
-                        return new Token { Type = LineType.Variable };
-                    else
-                        throw new FormatException("incr op. + nonvariable");
-                }
-                throw new FormatException($"can't parse. {ss.RawString}");
+                if (!IsDecr(ss.Peek(1)))
+                    throw new FormatException($"can't parse. {ss.RawString}");
+
+                Consume('-');
+                Consume('-');
+                SkipSpace();
+                var t = GetToken();
+                return t.Type == LineType.Variable ? new Token { Type = LineType.Variable } : throw new FormatException("incr op. + nonvariable");
             }
             else
             {
