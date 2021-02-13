@@ -342,7 +342,8 @@ namespace ERBPP
                             SkipSpace();
                             //全部大文字にして登録する。eraTWアリス口上 日常系コマンドで大文字小文字の混乱がある。
                             var v = GetIdent().ToUpper();
-                            if (v == "DYNAMIC" || v == "REF")
+                            // 動的・参照型・定数
+                            if (v == "DYNAMIC" || v == "REF" || v == "CONST")
                             {
                                 SkipSpace();
                                 v = GetIdent().ToUpper();
