@@ -349,7 +349,7 @@ namespace ERBPP
                             return new Token { Type = LineType.VariableDefinition };
                         }
                     default:
-                        return new Token { Type = LineType.Unknown };
+                        throw new FormatException($"unknown attribute. ({ident})");
                 }
             }
             else if (IsLabelStart(ss.Current))
