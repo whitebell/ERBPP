@@ -231,6 +231,8 @@ namespace ERBPP
                         }
                         goto REDO;
 
+                    case LineType.Unknown:
+                        throw new FormatException(@"unknown line type. ({l})");
                     default:
                         sw.Write(new string('\t', curIndentLv));
                         sw.WriteLine(l);
