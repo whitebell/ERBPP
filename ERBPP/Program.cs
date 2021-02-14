@@ -253,7 +253,8 @@ namespace ERBPP
     {
         private readonly StringStream ss;
 
-        private static readonly HashSet<string> variable = new();
+        private static readonly HashSet<string> functionLocalUdv = new();
+        private static readonly HashSet<string> erhGlobalUdv = new();
 
         public PseudoLexer(string s) => ss = new StringStream(s.TrimEnd('\r', '\n'));
 
@@ -319,7 +320,7 @@ namespace ERBPP
             }
             else if (IsFunctionStart(ss.Current))
             {
-                variable.Clear();
+                functionLocalUdv.Clear();
                 return new Token { Type = LineType.FunctionDefinition };
             }
             else if (IsAttributeStart(ss.Current))
@@ -348,8 +349,8 @@ namespace ERBPP
                                 SkipSpace();
                                 v = GetIdent().ToUpper();
                             }
-                            if (!variable.Contains(v))
-                                variable.Add(v);
+                            if (!functionLocalUdv.Contains(v))
+                                functionLocalUdv.Add(v);
                             return new Token { Type = LineType.VariableDefinition };
                         }
                     default:
@@ -999,11 +1000,45 @@ namespace ERBPP
                         return new Token { Type = LineType.Variable };
 
                     default:
-                        if (variable.Contains(ident.ToUpper()))
+                        // emueraに実装された命令・代入可能な変数は上で見ているので、ここまできたら未知の識別子
+
+                        // Function-local UDV
+                        if (functionLocalUdv.Contains(ident.ToUpper()))
                             return new Token { Type = LineType.Variable };
-                        throw new FormatException($"unknown ident name ({(String.IsNullOrWhiteSpace(ident) ? ss.RawString : ident)})");
-                        //return new Token { Type = LineType.ErhUserDefVariable }; // ERHで定義されたグローバルなUDVだとここに来る
-                        //現状では上のcaseで判定していない関数/変数があるのでそれもここにきてしまう。
+
+                        // GlobalUDV
+                        if (erhGlobalUdv.Contains(ident.ToUpper()))
+                            return new Token { Type = LineType.ErhUserDefVariable };
+
+                        SkipSpace();
+
+                        // 変数っぽく見えるものは変数と仮定する
+                        if (IsVariableSeparator(ss.Current) || ss.Current == '=')
+                        {
+                            // VAR:XXX ... , VAR = ...
+                            //Console.Error.WriteLine($"parse \"{ident}\" as global UDV.");
+                            erhGlobalUdv.Add(ident.ToUpper());
+                            return new Token { Type = LineType.ErhUserDefVariable };
+                        }
+                        else if ((ss.Current == '+' || ss.Current == '-' || ss.Current == '*' || ss.Current == '/' || ss.Current == '\'') && ss.Peek(1) == '=')
+                        {
+                            // VAR += n, VAR -= n, VAR *= n, VAR /= n, VAR '= "..."
+                            //Console.Error.WriteLine($"parse \"{ident}\" as global UDV.");
+                            erhGlobalUdv.Add(ident.ToUpper());
+                            return new Token { Type = LineType.ErhUserDefVariable };
+                        }
+                        else if ((ss.Current == '+' || ss.Current == '-') && ss.Peek(1) == ss.Current)
+                        {
+                            // VAR++, VAR--
+                            //Console.Error.WriteLine($"parse \"{ident}\" as global UDV.");
+                            erhGlobalUdv.Add(ident.ToUpper());
+                            return new Token { Type = LineType.ErhUserDefVariable };
+                        }
+                        else
+                        {
+                            // 扱いが変数っぽく見えない本当に不明なもの
+                            throw new FormatException($"unknown ident name ({(String.IsNullOrWhiteSpace(ident) ? ss.RawString : ident)})");
+                        }
                 }
             }
         }
