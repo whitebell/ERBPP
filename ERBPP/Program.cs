@@ -370,12 +370,18 @@ namespace ERBPP
                 {
                     case "SKIPSTART":
                     case "SKIPEND":
-                    case "IF":
-                    case "ELSEIF":
+                    //case "IF":
+                    //case "ELSEIF":
                     case "ELSE":
                     case "ENDIF":
                     case "IF_DEBUG":
                     case "IF_NDEBUG":
+                        return IsSpBlockEnd(ss.Current) ? new Token { Type = LineType.SpBlock } : throw new FormatException($"unknown spblock: {ident}");
+                    case "IF":
+                    case "ELSEIF":
+                        SkipSpace();
+                        GetIdent();
+                        SkipSpace();
                         return IsSpBlockEnd(ss.Current) ? new Token { Type = LineType.SpBlock } : throw new FormatException($"unknown spblock: {ident}");
                     default:
                         throw new FormatException($"unknown spblock: {ident}");
