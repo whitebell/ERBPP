@@ -21,12 +21,14 @@ namespace ERBPP
             var sw = new StreamWriter(Console.OpenStandardOutput(), Encoding.UTF8) { AutoFlush = true };
 #endif
 
-            string? l;
+            string l;
             var curIndentLv = 0;
             var prevType = LineType.Unknown;
             var regionStack = new Stack<int>();
-            while ((l = sr.ReadLine()?.TrimStart()) is not null)
+            //while ((l = sr.ReadLine()?.TrimStart()) is not null)
+            while (!sr.EndOfStream)
             {
+                l = sr.ReadLine()!.TrimStart(); // because !sr.EndOfStream, sr.ReadLine() returns string.
             READLINE_REDO:
                 var t = new PseudoLexer(l).GetToken();
 
@@ -110,19 +112,17 @@ namespace ERBPP
                         {
                             sw.Write(new string('\t', curIndentLv));
                             sw.WriteLine(l);
-                            l = sr.ReadLine()?.TrimStart();
-                            if (l is null)
-                                throw new FormatException("last line sif");
 
                             // eratohoJ+ COMF140.ERB SIFの次にコメント行。しぬべき。
                             var lst = new List<string>();
-                            do
+                            while (!sr.EndOfStream)
                             {
+                                l = sr.ReadLine()!.TrimStart(); //because !sr.EndOfStream, sr.ReadLine() returns string.
                                 lst.Add(l);
                                 t = new PseudoLexer(l).GetToken();
-                                if (t.Type != LineType.Comment)
+                                if (t.Type != LineType.Comment && t.Type != LineType.Blank && t.Type != LineType.StartRegionComment && t.Type != LineType.EndRegionComment)
                                     break;
-                            } while ((l = sr.ReadLine()?.TrimStart()) is not null);
+                            }
                             foreach (var e in lst)
                             {
                                 sw.Write(new string('\t', curIndentLv + 1));
