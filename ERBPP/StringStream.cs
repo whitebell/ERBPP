@@ -64,7 +64,7 @@ namespace Whitebell.Library.Utils
         /// <summary>指定した <see cref="Object"/> が現在の <see cref="StringStream"/>  と等しいかどうかを判断します。</summary>
         /// <param name="obj">現在の <see cref="StringStream"/> と比較する <see cref="Object"/>。</param>
         /// <returns>指定した <see cref="Object"/> が現在の <see cref="StringStream"/> と等しい場合は true。それ以外の場合は false。</returns>
-        public override bool Equals(object obj) => obj is StringStream s && Equals(s);
+        public override bool Equals(object? obj) => obj is StringStream s && Equals(s);
 
         /// <summary>指定した <see cref="StringStream"/> が現在の <see cref="StringStream"/> と等しいかどうかを判断します。</summary>
         /// <param name="ss">現在の <see cref="StringStream"/> と比較する <see cref="StringStream"/>。</param>

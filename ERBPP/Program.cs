@@ -21,16 +21,13 @@ namespace ERBPP
             var sw = new StreamWriter(Console.OpenStandardOutput(), Encoding.UTF8) { AutoFlush = true };
 #endif
 
-            string l;
+            string? l;
             var curIndentLv = 0;
             var prevType = LineType.Unknown;
             var regionStack = new Stack<int>();
             while ((l = sr.ReadLine()?.TrimStart()) is not null)
             {
-            REDO:
-                if (l is null)
-                    break; // goto REDO でここに戻った場合 l が null でありうる
-
+            READLINE_REDO:
                 var t = new PseudoLexer(l).GetToken();
 
                 switch (t.Type)
@@ -138,7 +135,7 @@ namespace ERBPP
                     case LineType.StartRegionComment:
                         {
                             var lst = new List<(LineType, string)> { (t.Type, l) };
-                            string nl;
+                            string? nl;
                             var nextType = LineType.Unknown;
                             while ((nl = sr.ReadLine()?.TrimStart()) is not null)
                             {
@@ -153,10 +150,10 @@ namespace ERBPP
                                         break;
                                     default:
                                         nextType = nt.Type;
-                                        goto BREAK;
+                                        goto READ_COMMENT_END;
                                 }
                             }
-                        BREAK:
+                        READ_COMMENT_END:
                             switch (nextType)
                             {
                                 case LineType.ElseIf:
@@ -229,10 +226,14 @@ namespace ERBPP
                             }
                             l = nl;
                         }
-                        goto REDO;
+                        if (l is null)
+                            goto READLINE_BREAK;
+
+                        goto READLINE_REDO;
 
                     case LineType.Unknown:
                         throw new FormatException($"unknown line type. ({l})");
+
                     default:
                         sw.Write(new string('\t', curIndentLv));
                         sw.WriteLine(l);
@@ -243,6 +244,7 @@ namespace ERBPP
                     prevType = t.Type;
                 sw.Flush();
             }
+        READLINE_BREAK:
 
             if (regionStack.Count != 0)
                 throw new FormatException($"region/endregion stack err. c={regionStack.Count}");
