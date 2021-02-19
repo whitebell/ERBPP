@@ -113,19 +113,28 @@ namespace ERBPP
                             sw.WriteLine(l);
 
                             // eratohoJ+ COMF140.ERB SIFの次にコメント行。しぬべき。
-                            var lst = new List<string>();
+                            var lst = new List<(LineType, string)>();
                             while (!sr.EndOfStream)
                             {
                                 l = sr.ReadLine()!.TrimStart(); // !sr.EndOfStream. sr.ReadLine() returns string.
-                                lst.Add(l);
                                 t = new PseudoLexer(l).GetToken();
+                                lst.Add((t.Type, l));
                                 if (t.Type != LineType.Comment && t.Type != LineType.Blank && t.Type != LineType.StartRegionComment && t.Type != LineType.EndRegionComment)
                                     break;
                             }
                             foreach (var e in lst)
                             {
-                                sw.Write(new string('\t', curIndentLv + 1));
-                                sw.WriteLine(e);
+                                switch (e.Item1)
+                                {
+                                    case LineType.Blank:
+                                        sw.WriteLine();
+                                        break;
+                                    default:
+                                        // Start/EndRegionCommentあたり怪しいかもしれない
+                                        sw.Write(new string('\t', curIndentLv + 1));
+                                        sw.WriteLine(e.Item2);
+                                        break;
+                                }
                             }
                         }
                         break;
