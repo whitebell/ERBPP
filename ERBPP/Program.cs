@@ -25,10 +25,9 @@ namespace ERBPP
             var curIndentLv = 0;
             var prevType = LineType.Unknown;
             var regionStack = new Stack<int>();
-            //while ((l = sr.ReadLine()?.TrimStart()) is not null)
             while (!sr.EndOfStream)
             {
-                l = sr.ReadLine()!.TrimStart(); // because !sr.EndOfStream, sr.ReadLine() returns string.
+                l = sr.ReadLine()!.TrimStart(); // !sr.EndOfStream. sr.ReadLine() returns string.
             READLINE_REDO:
                 var t = new PseudoLexer(l).GetToken();
 
@@ -117,7 +116,7 @@ namespace ERBPP
                             var lst = new List<string>();
                             while (!sr.EndOfStream)
                             {
-                                l = sr.ReadLine()!.TrimStart(); //because !sr.EndOfStream, sr.ReadLine() returns string.
+                                l = sr.ReadLine()!.TrimStart(); // !sr.EndOfStream. sr.ReadLine() returns string.
                                 lst.Add(l);
                                 t = new PseudoLexer(l).GetToken();
                                 if (t.Type != LineType.Comment && t.Type != LineType.Blank && t.Type != LineType.StartRegionComment && t.Type != LineType.EndRegionComment)
@@ -135,10 +134,11 @@ namespace ERBPP
                     case LineType.StartRegionComment:
                         {
                             var lst = new List<(LineType, string)> { (t.Type, l) };
-                            string? nl;
+                            string nl;
                             var nextType = LineType.Unknown;
-                            while ((nl = sr.ReadLine()?.TrimStart()) is not null)
+                            while (!sr.EndOfStream)
                             {
+                                nl = sr.ReadLine()!.TrimStart(); // !sr.EndOfStream. sr.ReadLine() returns string.
                                 var nt = new PseudoLexer(nl).GetToken();
                                 switch (nt.Type)
                                 {
@@ -150,6 +150,7 @@ namespace ERBPP
                                         break;
                                     default:
                                         nextType = nt.Type;
+                                        l = nl;
                                         goto READ_COMMENT_END;
                                 }
                             }
@@ -224,9 +225,8 @@ namespace ERBPP
                                     }
                                     break;
                             }
-                            l = nl;
                         }
-                        if (l is null)
+                        if (sr.EndOfStream)
                             goto READLINE_BREAK;
 
                         goto READLINE_REDO;
