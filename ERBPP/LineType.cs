@@ -22,6 +22,15 @@
         EndRegionComment,
 
         /// <summary>
+        /// 行連結開始 '{'
+        /// </summary>
+        StartConcat,
+        /// <summary>
+        /// 行連結終了 '}'
+        /// </summary>
+        EndConcat,
+
+        /// <summary>
         /// 関数定義
         /// </summary>
         FunctionDefinition,

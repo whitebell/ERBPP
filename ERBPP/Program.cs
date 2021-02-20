@@ -5,9 +5,9 @@ using System.Text;
 
 namespace ERBPP
 {
-    public class Program
+    public static class Program
     {
-        public static void Main(string[] args)
+        public static void Main()
         {
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 #if DEBUG
@@ -50,6 +50,37 @@ namespace ERBPP
                             else
                                 sw.Write(new string('\t', res));
                         }
+                        sw.WriteLine(l);
+                        break;
+
+                    case LineType.StartConcat:
+                        {
+                            sw.Write(new string('\t', curIndentLv));
+                            sw.WriteLine(l);
+
+                            if (sr.EndOfStream)
+                                throw new FormatException("last line concat. '{' ().");
+
+                            l = sr.ReadLine()!.TrimStart(); // !sr.EndOfStream. sr.ReadLine() returns string.
+                            t = new PseudoLexer(l).GetToken();
+                            if (t.Type != LineType.EndConcat)
+                            {
+                                sw.Write(new string('\t', curIndentLv++));
+                                sw.WriteLine(l);
+                            }
+                            while (!sr.EndOfStream)
+                            {
+                                // 2行目以降は連結しないと意味が取れない不完全行なので、PseudoLexerには食べさせない
+                                l = sr.ReadLine()!.TrimStart(); // !sr.EndOfStream. sr.ReadLine() returns string.
+                                if (l.StartsWith('}'))
+                                    goto READLINE_REDO;
+                                sw.Write(new string('\t', curIndentLv));
+                                sw.WriteLine(l);
+                            }
+                            throw new FormatException("line concat ({ ... }) hasn't been closed.");
+                        }
+                    case LineType.EndConcat:
+                        sw.Write(new string('\t', --curIndentLv));
                         sw.WriteLine(l);
                         break;
 

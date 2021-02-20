@@ -146,6 +146,14 @@ namespace ERBPP
                         throw new FormatException($"unknown spblock: {ident}");
                 }
             }
+            else if (IsConcatStart(ss.Current))
+            {
+                return new Token(LineType.StartConcat);
+            }
+            else if (IsConcatEnd(ss.Current))
+            {
+                return new Token(LineType.EndConcat);
+            }
             else if (IsIncr(ss.Current))
             {
                 if (!IsIncr(ss.Peek(1)))
@@ -812,5 +820,7 @@ namespace ERBPP
         private static bool IsDecr(char c) => c == '-';
         private static bool IsSpBlockStart(char c) => c == '[';
         private static bool IsSpBlockEnd(char c) => c == ']';
+        private static bool IsConcatStart(char c) => c == '{';
+        private static bool IsConcatEnd(char c) => c == '}';
     }
 }
