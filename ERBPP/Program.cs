@@ -1072,7 +1072,6 @@ namespace ERBPP
 
     public class Token
     {
-        public string Value { get; init; } = "";
         public LineType Type { get; init; } = LineType.Unknown;
     }
 
