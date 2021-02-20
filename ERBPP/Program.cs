@@ -310,7 +310,7 @@ namespace ERBPP
 
             if (ss.EndOfStream)
             {
-                return new Token { Type = LineType.Blank };
+                return new Token(LineType.Blank);
             }
             else if (IsCommentStart(ss.Current))
             {
@@ -324,15 +324,15 @@ namespace ERBPP
 
                 return GetIdent().ToLower() switch
                 {
-                    "region"    => new Token { Type = LineType.StartRegionComment },
-                    "endregion" => new Token { Type = LineType.EndRegionComment },
-                    _           => new Token { Type = LineType.Comment },
+                    "region"    => new Token(LineType.StartRegionComment),
+                    "endregion" => new Token(LineType.EndRegionComment),
+                    _           => new Token(LineType.Comment),
                 };
             }
             else if (IsFunctionStart(ss.Current))
             {
                 functionLocalUdv.Clear();
-                return new Token { Type = LineType.FunctionDefinition };
+                return new Token(LineType.FunctionDefinition);
             }
             else if (IsAttributeStart(ss.Current))
             {
@@ -347,7 +347,7 @@ namespace ERBPP
                     case "LOCALSSIZE":
                     case "LATER":
                     case "PRI":
-                        return new Token { Type = LineType.Attribute };
+                        return new Token(LineType.Attribute);
                     case "DIM":
                     case "DIMS":
                         {
@@ -362,7 +362,7 @@ namespace ERBPP
                             }
                             if (!functionLocalUdv.Contains(v))
                                 functionLocalUdv.Add(v);
-                            return new Token { Type = LineType.VariableDefinition };
+                            return new Token(LineType.VariableDefinition);
                         }
                     default:
                         throw new FormatException($"unknown attribute. ({ident})");
@@ -370,7 +370,7 @@ namespace ERBPP
             }
             else if (IsLabelStart(ss.Current))
             {
-                return new Token { Type = LineType.Label };
+                return new Token(LineType.Label);
             }
             else if (IsSpBlockStart(ss.Current))
             {
@@ -388,13 +388,13 @@ namespace ERBPP
                     case "ENDIF":
                     case "IF_DEBUG":
                     case "IF_NDEBUG":
-                        return IsSpBlockEnd(ss.Current) ? new Token { Type = LineType.SpBlock } : throw new FormatException($"unknown spblock: {ident}");
+                        return IsSpBlockEnd(ss.Current) ? new Token(LineType.SpBlock) : throw new FormatException($"unknown spblock: {ident}");
                     case "IF":
                     case "ELSEIF":
                         SkipSpace();
                         GetIdent();
                         SkipSpace();
-                        return IsSpBlockEnd(ss.Current) ? new Token { Type = LineType.SpBlock } : throw new FormatException($"unknown spblock: {ident}");
+                        return IsSpBlockEnd(ss.Current) ? new Token(LineType.SpBlock) : throw new FormatException($"unknown spblock: {ident}");
                     default:
                         throw new FormatException($"unknown spblock: {ident}");
                 }
@@ -408,7 +408,7 @@ namespace ERBPP
                 Consume('+');
                 SkipSpace();
                 var t = GetToken();
-                return t.Type == LineType.Variable ? new Token { Type = LineType.Variable } : throw new FormatException("incr op. + nonvariable");
+                return t.Type == LineType.Variable ? new Token(LineType.Variable) : throw new FormatException("incr op. + nonvariable");
             }
             else if (IsDecr(ss.Current))
             {
@@ -419,7 +419,7 @@ namespace ERBPP
                 Consume('-');
                 SkipSpace();
                 var t = GetToken();
-                return t.Type == LineType.Variable ? new Token { Type = LineType.Variable } : throw new FormatException("incr op. + nonvariable");
+                return t.Type == LineType.Variable ? new Token(LineType.Variable) : throw new FormatException("incr op. + nonvariable");
             }
             else
             {
@@ -427,82 +427,82 @@ namespace ERBPP
                 switch (ident.ToUpper())
                 {
                     case "SIF":
-                        return new Token { Type = LineType.Sif };
+                        return new Token(LineType.Sif);
 
                     case "IF":
-                        return new Token { Type = LineType.If };
+                        return new Token(LineType.If);
                     case "ELSEIF":
-                        return new Token { Type = LineType.ElseIf };
+                        return new Token(LineType.ElseIf);
                     case "ELSE":
-                        return new Token { Type = LineType.Else };
+                        return new Token(LineType.Else);
                     case "ENDIF":
-                        return new Token { Type = LineType.Endif };
+                        return new Token(LineType.Endif);
 
                     case "REPEAT":
-                        return new Token { Type = LineType.Repeat };
+                        return new Token(LineType.Repeat);
                     case "REND":
-                        return new Token { Type = LineType.Rend };
+                        return new Token(LineType.Rend);
 
                     case "SELECTCASE":
-                        return new Token { Type = LineType.SelectCase };
+                        return new Token(LineType.SelectCase);
                     case "CASE":
-                        return new Token { Type = LineType.Case };
+                        return new Token(LineType.Case);
                     case "CASEELSE":
-                        return new Token { Type = LineType.CaseElse };
+                        return new Token(LineType.CaseElse);
                     case "ENDSELECT":
-                        return new Token { Type = LineType.EndSelect };
+                        return new Token(LineType.EndSelect);
 
                     case "FOR":
-                        return new Token { Type = LineType.For };
+                        return new Token(LineType.For);
                     case "NEXT":
-                        return new Token { Type = LineType.Next };
+                        return new Token(LineType.Next);
 
                     case "WHILE":
-                        return new Token { Type = LineType.While };
+                        return new Token(LineType.While);
                     case "WEND":
-                        return new Token { Type = LineType.Wend };
+                        return new Token(LineType.Wend);
 
                     case "DO":
-                        return new Token { Type = LineType.Do };
+                        return new Token(LineType.Do);
                     case "LOOP":
-                        return new Token { Type = LineType.Loop };
+                        return new Token(LineType.Loop);
 
                     case "BREAK":
-                        return new Token { Type = LineType.Break };
+                        return new Token(LineType.Break);
 
                     case "CONTINUE":
-                        return new Token { Type = LineType.Continue };
+                        return new Token(LineType.Continue);
 
                     case "TRYCALLLIST":
-                        return new Token { Type = LineType.TryCallList };
+                        return new Token(LineType.TryCallList);
                     case "TRYGOTOLIST":
-                        return new Token { Type = LineType.TryGotoList };
+                        return new Token(LineType.TryGotoList);
                     case "TRYJUMPLIST":
-                        return new Token { Type = LineType.TryJumpList };
+                        return new Token(LineType.TryJumpList);
                     case "FUNC":
-                        return new Token { Type = LineType.Func };
+                        return new Token(LineType.Func);
                     case "ENDFUNC":
-                        return new Token { Type = LineType.EndFunc };
+                        return new Token(LineType.EndFunc);
 
                     case "TRYCCALL":
                     case "TRYCCALLFORM":
-                        return new Token { Type = LineType.TryCCall };
+                        return new Token(LineType.TryCCall);
                     case "TRYCGOTO":
                     case "TRYCGOTOFORM":
-                        return new Token { Type = LineType.TryCGoto };
+                        return new Token(LineType.TryCGoto);
                     case "TRYCJUMP":
                     case "TRYCJUMPFORM":
-                        return new Token { Type = LineType.TryCJump };
+                        return new Token(LineType.TryCJump);
                     case "CATCH":
-                        return new Token { Type = LineType.Catch };
+                        return new Token(LineType.Catch);
                     case "ENDCATCH":
-                        return new Token { Type = LineType.EndCatch };
+                        return new Token(LineType.EndCatch);
 
                     case "BEGIN":
-                        return new Token { Type = LineType.Begin };
+                        return new Token(LineType.Begin);
 
                     case "RESTART":
-                        return new Token { Type = LineType.Restart };
+                        return new Token(LineType.Restart);
 
                     case "CALL":
                     case "CALLF":
@@ -510,27 +510,27 @@ namespace ERBPP
                     case "CALLFORMF":
                     case "TRYCALL":
                     case "TRYCALLFORM":
-                        return new Token { Type = LineType.Call };
+                        return new Token(LineType.Call);
 
                     case "JUMP":
                     case "JUMPFORM":
                     case "TRYJUMP":
                     case "TRYJUMPFORM":
-                        return new Token { Type = LineType.Jump };
+                        return new Token(LineType.Jump);
 
                     case "GOTO":
                     case "GOTOFORM":
                     case "TRYGOTO":
                     case "TRYGOTOFORM":
-                        return new Token { Type = LineType.Goto };
+                        return new Token(LineType.Goto);
 
                     case "RETURN":
                     case "RETURNF":
                     case "RETURNFORM":
-                        return new Token { Type = LineType.Return };
+                        return new Token(LineType.Return);
 
                     case "THROW":
-                        return new Token { Type = LineType.Throw };
+                        return new Token(LineType.Throw);
 
                     case "PRINTDATA":
                     case "PRINTDATAD":
@@ -541,18 +541,18 @@ namespace ERBPP
                     case "PRINTDATAKW":
                     case "PRINTDATAL":
                     case "PRINTDATAW":
-                        return new Token { Type = LineType.PrintData };
+                        return new Token(LineType.PrintData);
                     case "STRDATA":
-                        return new Token { Type = LineType.StrData };
+                        return new Token(LineType.StrData);
                     case "DATALIST":
-                        return new Token { Type = LineType.DataList };
+                        return new Token(LineType.DataList);
                     case "ENDLIST":
-                        return new Token { Type = LineType.EndList };
+                        return new Token(LineType.EndList);
                     case "DATA":
                     case "DATAFORM":
-                        return new Token { Type = LineType.Data };
+                        return new Token(LineType.Data);
                     case "ENDDATA":
-                        return new Token { Type = LineType.EndData };
+                        return new Token(LineType.EndData);
 
                     case "ABS":
                     case "ADDCHARA":
@@ -904,7 +904,7 @@ namespace ERBPP
                     case "VARSIZE":
                     case "WAIT":
                     case "WAITANYKEY":
-                        return new Token { Type = LineType.BuiltinFunction };
+                        return new Token(LineType.BuiltinFunction);
 
                     case "MASTER":
                     case "PLAYER":
@@ -1008,18 +1008,18 @@ namespace ERBPP
                     case "DITEMTYPE":
                     case "TA":
                     case "TB":
-                        return new Token { Type = LineType.Variable };
+                        return new Token(LineType.Variable);
 
                     default:
                         // emueraに実装された命令・代入可能な変数は上で見ているので、ここまできたら未知の識別子
 
                         // Function-local UDV
                         if (functionLocalUdv.Contains(ident.ToUpper()))
-                            return new Token { Type = LineType.Variable };
+                            return new Token(LineType.Variable);
 
                         // GlobalUDV
                         if (erhGlobalUdv.Contains(ident.ToUpper()))
-                            return new Token { Type = LineType.ErhUserDefVariable };
+                            return new Token(LineType.ErhUserDefVariable);
 
                         SkipSpace();
 
@@ -1029,21 +1029,21 @@ namespace ERBPP
                             // VAR:XXX ... , VAR = ...
                             //Console.Error.WriteLine($"parse \"{ident}\" as global UDV.");
                             erhGlobalUdv.Add(ident.ToUpper());
-                            return new Token { Type = LineType.ErhUserDefVariable };
+                            return new Token(LineType.ErhUserDefVariable);
                         }
                         else if ((ss.Current == '+' || ss.Current == '-' || ss.Current == '*' || ss.Current == '/' || ss.Current == '\'') && ss.Peek(1) == '=')
                         {
                             // VAR += n, VAR -= n, VAR *= n, VAR /= n, VAR '= "..."
                             //Console.Error.WriteLine($"parse \"{ident}\" as global UDV.");
                             erhGlobalUdv.Add(ident.ToUpper());
-                            return new Token { Type = LineType.ErhUserDefVariable };
+                            return new Token(LineType.ErhUserDefVariable);
                         }
                         else if ((ss.Current == '+' || ss.Current == '-') && ss.Peek(1) == ss.Current)
                         {
                             // VAR++, VAR--
                             //Console.Error.WriteLine($"parse \"{ident}\" as global UDV.");
                             erhGlobalUdv.Add(ident.ToUpper());
-                            return new Token { Type = LineType.ErhUserDefVariable };
+                            return new Token(LineType.ErhUserDefVariable);
                         }
                         else
                         {
@@ -1065,15 +1065,9 @@ namespace ERBPP
         private static bool IsDecr(char c) => c == '-';
         private static bool IsSpBlockStart(char c) => c == '[';
         private static bool IsSpBlockEnd(char c) => c == ']';
-        //private static bool IsIdentStart(char c) => Char.IsLetter(c);
-
-        //private Token Ident() => throw new NotImplementedException();
     }
 
-    public class Token
-    {
-        public LineType Type { get; init; } = LineType.Unknown;
-    }
+    public record Token(LineType Type);
 
     public enum LineType
     {
