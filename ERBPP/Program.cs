@@ -63,11 +63,15 @@ namespace ERBPP
 
                             l = sr.ReadLine()!.TrimStart(); // !sr.EndOfStream. sr.ReadLine() returns string.
                             t = new PseudoLexer(l).GetToken();
-                            if (t.Type != LineType.EndConcat)
+                            if (t.Type == LineType.EndConcat)
                             {
-                                sw.Write(new string('\t', curIndentLv++));
+                                sw.Write(new string('\t', curIndentLv));
                                 sw.WriteLine(l);
+                                break;
                             }
+
+                            sw.Write(new string('\t', curIndentLv++));
+                            sw.WriteLine(l);
                             while (!sr.EndOfStream)
                             {
                                 // 2行目以降は連結しないと意味が取れない不完全行なので、PseudoLexerには食べさせない
