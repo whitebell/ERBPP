@@ -195,7 +195,6 @@ namespace ERBPP
                                 var nt = new PseudoLexer(nl).GetToken();
                                 switch (nt.Type)
                                 {
-                                    case LineType.Blank:
                                     case LineType.Comment:
                                     case LineType.StartRegionComment:
                                     case LineType.EndRegionComment:
