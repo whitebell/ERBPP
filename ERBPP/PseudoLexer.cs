@@ -181,7 +181,7 @@ namespace ERBPP
                 return t.Type switch
                 {
                     LineType.Variable or LineType.ErhUserDefVariable => new Token(t.Type),
-                    _ => throw new FormatException("incr op. + nonvariable"),
+                    _ => throw new FormatException("decr op. + nonvariable"),
                 };
             }
             else
