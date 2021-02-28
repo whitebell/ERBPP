@@ -11,9 +11,11 @@ namespace ERBPP
         {
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 #if DEBUG
-            using var fs = File.Open("D:\\Game\\eratoho\\EVENT_K14\\EVENT_K14.ERB", FileMode.Open, FileAccess.Read);
+            //using var fs = File.Open("D:\\Game\\eratoho\\EVENT_K14\\EVENT_K14.ERB", FileMode.Open, FileAccess.Read);
+            using var fs = File.Open(@"D:\Repository\whitebell\ERBPP\TESTCASE.ERB", FileMode.Open, FileAccess.Read);
             using var sr = new StreamReader(fs, Encoding.UTF8);
-            using var fw = File.Open("D:\\Game\\eratoho\\EVENT_K14\\EVENT_K14.PP.ERB", FileMode.Create, FileAccess.Write);
+            //using var fw = File.Open("D:\\Game\\eratoho\\EVENT_K14\\EVENT_K14.PP.ERB", FileMode.Create, FileAccess.Write);
+            using var fw = File.Open(@"D:\Repository\whitebell\ERBPP\TESTCASE.PP.ERB", FileMode.Create, FileAccess.Write);
             using var sw = new StreamWriter(fw, Encoding.UTF8) { AutoFlush = true };
 #elif RELEASE
             var sr = new StreamReader(Console.OpenStandardInput(), Encoding.UTF8);
