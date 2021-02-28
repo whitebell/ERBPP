@@ -163,7 +163,11 @@ namespace ERBPP
                 Consume('+');
                 SkipSpace();
                 var t = GetToken();
-                return t.Type == LineType.Variable ? new Token(LineType.Variable) : throw new FormatException("incr op. + nonvariable");
+                return t.Type switch
+                {
+                    LineType.Variable or LineType.ErhUserDefVariable => new Token(t.Type),
+                    _ => throw new FormatException("incr op. + nonvariable"),
+                };
             }
             else if (IsDecr(ss.Current))
             {
@@ -174,7 +178,11 @@ namespace ERBPP
                 Consume('-');
                 SkipSpace();
                 var t = GetToken();
-                return t.Type == LineType.Variable ? new Token(LineType.Variable) : throw new FormatException("incr op. + nonvariable");
+                return t.Type switch
+                {
+                    LineType.Variable or LineType.ErhUserDefVariable => new Token(t.Type),
+                    _ => throw new FormatException("incr op. + nonvariable"),
+                };
             }
             else
             {
