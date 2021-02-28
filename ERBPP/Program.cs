@@ -72,6 +72,7 @@ namespace ERBPP
 
                             sw.Write(new string('\t', curIndentLv++));
                             sw.WriteLine(l);
+                            prevType = t.Type;
                             while (!sr.EndOfStream)
                             {
                                 // 2行目以降は連結しないと意味が取れない不完全行なので、PseudoLexerには食べさせない
@@ -86,6 +87,13 @@ namespace ERBPP
                     case LineType.EndConcat:
                         sw.Write(new string('\t', --curIndentLv));
                         sw.WriteLine(l);
+                        switch (prevType)
+                        {
+                            case LineType.If:
+                            case LineType.ElseIf:
+                                curIndentLv++;
+                                break;
+                        }
                         break;
 
                     case LineType.If:
