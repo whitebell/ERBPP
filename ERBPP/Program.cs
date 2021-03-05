@@ -5,97 +5,232 @@ using System.Text;
 
 namespace ERBPP
 {
+    public static class Constant
+    {
+        public const string Indent = "\t";
+        public const string ConcatBlockIndent = "\t";
+    }
+
+    public class ErbLineReader : IDisposable
+    {
+        private readonly StreamReader reader;
+
+        /// <summary>Gets a value that indicates whether the current read position is at the end of the reader.</summary>
+        /// <returns><see langword="true"/> if the current read position is at the end of the reader; otherwise <see langword="false"/>.</returns>
+        /// <exception cref="ObjectDisposedException">The underlying stream has been disposed.</exception>
+        public bool EndOfReader => reader.EndOfStream;
+
+        public ErbLineReader(Stream stream, Encoding encoding) => reader = new StreamReader(stream, encoding);
+
+        public IErbLine? ReadLine()
+        {
+            if (reader.EndOfStream)
+                return null;
+
+            var line = reader.ReadLine()!.TrimStart();
+            var t = new PseudoLexer(line).GetToken().Type;
+
+            switch (t)
+            {
+                case LineType.StartConcat:
+                    break;
+                case LineType.Blank:
+                    return new ErbBlankLine();
+                default:
+                    return new ErbLine(t, line);
+            }
+
+            var lst = new List<string> { line };
+            while (!reader.EndOfStream)
+            {
+                line = reader.ReadLine()!.TrimStart();
+                lst.Add(line);
+                t = new PseudoLexer(line).GetToken().Type;
+                if (t == LineType.EndConcat)
+                    return new ErbConcatLines(t, lst);
+                if (t != LineType.Blank)
+                    break;
+            }
+            while (!reader.EndOfStream)
+            {
+                line = reader.ReadLine()!.TrimStart();
+                if (line.StartsWith('}'))
+                {
+                    lst.Add(line);
+                    return new ErbConcatLines(t, lst);
+                }
+                lst.Add(Constant.ConcatBlockIndent + line);
+            }
+            throw new FormatException("line concat ({ ... }) hasn't been closed."); // EOSまでたどり着いたケース
+        }
+
+        #region IDisposable
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                // dispose managed resources
+                reader?.Dispose();
+            }
+
+            // dispose unmanaged resources
+        }
+
+        ~ErbLineReader() => Dispose(false);
+        #endregion
+    }
+
+    public class ErbLineWriter : IDisposable
+    {
+        private readonly StreamWriter writer;
+
+        public int IndentLevel { get; set; }
+
+        public bool AutoFlush
+        {
+            get => writer.AutoFlush;
+            set => writer.AutoFlush = value;
+        }
+
+        public ErbLineWriter(Stream stream, Encoding encoding) => writer = new StreamWriter(stream, encoding);
+
+        // erbLine.ToIndentStringは末尾改行付きで返すので、ここでWriteLineを使うと不要な改行が入る
+        public void Write(IErbLine erbLine) => Write(erbLine, IndentLevel);
+
+        public void Write(IErbLine erbLine, int indentLv) => writer.Write(erbLine.ToIndentString(indentLv));
+
+        /// <summary>Clears all buffers for the current writer and causes any buffered data to be written to the underlying stream.</summary>
+        /// <exception cref="ObjectDisposedException">The current writer is closed.</exception>
+        /// <exception cref="IOException">An I/O error has occurred.</exception>
+        /// <exception cref="EncoderFallbackException">The current encoding does not support displaying half of a Unicode surrogate pair.</exception>
+        public void Flush() => writer.Flush();
+
+        #region IDisposable
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                // dispose managed resources
+                writer?.Dispose();
+            }
+
+            // dispose unmanaged resources
+        }
+
+        ~ErbLineWriter() => Dispose(false);
+        #endregion
+    }
+
+    public interface IErbLine
+    {
+        LineType Type { get; }
+        string RawString { get; }
+
+        /// <summary><paramref name="indentLv"/>で指定した深さのインデント付き文字列を返す</summary>
+        /// <returns>インデントした改行付き文字列</returns>
+        string ToIndentString(int indentLv);
+    }
+
+    public class ErbLine : IErbLine
+    {
+        public LineType Type { get; }
+        public string RawString { get; }
+
+        public ErbLine(LineType type, string str)
+        {
+            Type = type;
+            RawString = str;
+        }
+
+        public string ToIndentString(int indentLv) => new StringBuilder().Insert(0, Constant.Indent, indentLv).AppendLine(RawString).ToString();
+    }
+
+    public class ErbBlankLine : IErbLine
+    {
+        public LineType Type => LineType.Blank;
+        public string RawString => "";
+
+        public string ToIndentString(int indentLv) => Environment.NewLine;
+    }
+
+    public class ErbConcatLines : IErbLine
+    {
+        private readonly List<string> lines;
+
+        public LineType Type { get; }
+        public string RawString { get; }
+
+        public ErbConcatLines(LineType type, IList<string> lines)
+        {
+            Type = type;
+            this.lines = new List<string>(lines);
+            var sb = new StringBuilder();
+            foreach (var l in lines)
+                sb.Append(l);
+            RawString = sb.ToString();
+        }
+
+        public string ToIndentString(int indentLv)
+        {
+            var sb = new StringBuilder();
+            foreach (var l in lines)
+            {
+                if (String.IsNullOrWhiteSpace(l))
+                    sb.AppendLine();
+                else
+                    sb.Insert(sb.Length, Constant.Indent, indentLv).AppendLine(l);
+            }
+            return sb.ToString();
+        }
+    }
+
     public static class Program
     {
         public static void Main()
         {
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+
 #if DEBUG
-            //using var fs = File.Open("D:\\Game\\eratoho\\EVENT_K14\\EVENT_K14.ERB", FileMode.Open, FileAccess.Read);
-            using var fs = File.Open(@"D:\Repository\whitebell\ERBPP\TESTCASE.ERB", FileMode.Open, FileAccess.Read);
-            using var sr = new StreamReader(fs, Encoding.UTF8);
+            //using var fr = File.Open("D:\\Game\\eratoho\\EVENT_K14\\EVENT_K14.ERB", FileMode.Open, FileAccess.Read);
+            using var fr = File.Open(@"D:\Repository\whitebell\ERBPP\TESTCASE.ERB", FileMode.Open, FileAccess.Read);
+            using var er = new ErbLineReader(fr, Encoding.UTF8);
             //using var fw = File.Open("D:\\Game\\eratoho\\EVENT_K14\\EVENT_K14.PP.ERB", FileMode.Create, FileAccess.Write);
             using var fw = File.Open(@"D:\Repository\whitebell\ERBPP\TESTCASE.PP.ERB", FileMode.Create, FileAccess.Write);
-            using var sw = new StreamWriter(fw, Encoding.UTF8) { AutoFlush = true };
+            using var ew = new ErbLineWriter(fw, Encoding.UTF8) { AutoFlush = true };
 #elif RELEASE
-            var sr = new StreamReader(Console.OpenStandardInput(), Encoding.UTF8);
-            var sw = new StreamWriter(Console.OpenStandardOutput(), Encoding.UTF8) { AutoFlush = true };
+            using var er = new ErbLineReader(Console.OpenStandardInput(), Encoding.UTF8);
+            using var ew = new ErbLineWriter(Console.OpenStandardOutput(), Encoding.UTF8) { AutoFlush = true };
 #endif
 
-            string l;
-            var curIndentLv = 0;
+            IErbLine el;
             var prevType = LineType.Unknown;
             var regionStack = new Stack<int>();
-            while (!sr.EndOfStream)
+            while (!er.EndOfReader)
             {
-                l = sr.ReadLine()!.TrimStart(); // !sr.EndOfStream. sr.ReadLine() returns string.
+                el = er.ReadLine()!; // !er.EOR
             READLINE_REDO:
-                var t = new PseudoLexer(l).GetToken();
-
-                switch (t.Type)
+                switch (el.Type)
                 {
                     case LineType.Blank:
-                        sw.WriteLine();
+                        ew.Write(el);
                         break;
 
                     case LineType.FunctionDefinition:
-                        if (curIndentLv != 0)
+                        if (ew.IndentLevel != 0)
                             throw new FormatException("indented func def."); // 関数定義行でインデントされているのはおかしいので例外投げる
-
-                        sw.WriteLine(l);
-                        break;
-
-                    case LineType.EndRegionComment:
-                        {
-                            if (!regionStack.TryPop(out var res))
-                                throw new FormatException("region/endregion stack err.");
-                            else
-                                sw.Write(new string('\t', res));
-                        }
-                        sw.WriteLine(l);
-                        break;
-
-                    case LineType.StartConcat:
-                        {
-                            sw.Write(new string('\t', curIndentLv));
-                            sw.WriteLine(l);
-
-                            if (sr.EndOfStream)
-                                throw new FormatException("last line concat. '{' ().");
-
-                            l = sr.ReadLine()!.TrimStart(); // !sr.EndOfStream. sr.ReadLine() returns string.
-                            t = new PseudoLexer(l).GetToken();
-                            if (t.Type == LineType.EndConcat)
-                            {
-                                sw.Write(new string('\t', curIndentLv));
-                                sw.WriteLine(l);
-                                break;
-                            }
-
-                            sw.Write(new string('\t', curIndentLv++));
-                            sw.WriteLine(l);
-                            prevType = t.Type;
-                            while (!sr.EndOfStream)
-                            {
-                                // 2行目以降は連結しないと意味が取れない不完全行なので、PseudoLexerには食べさせない
-                                l = sr.ReadLine()!.TrimStart(); // !sr.EndOfStream. sr.ReadLine() returns string.
-                                if (l.StartsWith('}'))
-                                    goto READLINE_REDO;
-                                sw.Write(new string('\t', curIndentLv));
-                                sw.WriteLine(l);
-                            }
-                            throw new FormatException("line concat ({ ... }) hasn't been closed.");
-                        }
-                    case LineType.EndConcat:
-                        sw.Write(new string('\t', --curIndentLv));
-                        sw.WriteLine(l);
-                        switch (prevType)
-                        {
-                            case LineType.If:
-                            case LineType.ElseIf:
-                                curIndentLv++;
-                                break;
-                        }
+                        ew.Write(el);
                         break;
 
                     case LineType.If:
@@ -112,14 +247,12 @@ namespace ERBPP
                     case LineType.SelectCase:
                     case LineType.PrintData:
                     case LineType.StrData:
-                        sw.Write(new string('\t', curIndentLv++));
-                        sw.WriteLine(l);
+                        ew.Write(el, ew.IndentLevel++);
                         break;
                     case LineType.ElseIf:
                     case LineType.Else:
                     case LineType.Catch:
-                        sw.Write(new string('\t', curIndentLv - 1));
-                        sw.WriteLine(l);
+                        ew.Write(el, ew.IndentLevel- 1);
                         break;
                     case LineType.Endif:
                     case LineType.Rend:
@@ -130,53 +263,45 @@ namespace ERBPP
                     case LineType.EndCatch:
                     case LineType.EndList:
                     case LineType.EndData:
-                        sw.Write(new string('\t', --curIndentLv));
-                        sw.WriteLine(l);
+                        ew.Write(el, --ew.IndentLevel);
                         break;
                     case LineType.Case:
                     case LineType.CaseElse:
                         if (prevType == LineType.SelectCase)
-                            sw.Write(new string('\t', curIndentLv++)); // LineType.CaseElseでここにくるのは正気じゃないと思うが、実例があるのでしょうがない。eratohoJ+ REVMODE.ERB
+                            ew.Write(el, ew.IndentLevel++); // LineType.CaseElseでここにくるのは正気じゃないと思うが、実例があるのでしょうがない。eratohoJ+ REVMODE.ERB
                         else
-                            sw.Write(new string('\t', curIndentLv - 1));
-                        sw.WriteLine(l);
+                            ew.Write(el, ew.IndentLevel - 1);
                         break;
                     case LineType.DataList:
-                        sw.Write(new string('\t', curIndentLv++));
-                        sw.WriteLine(l);
+                        ew.Write(el, ew.IndentLevel++);
                         break;
                     case LineType.EndSelect:
-                        curIndentLv -= prevType == LineType.SelectCase ? 1 : 2; // eraTW ERB/MOVEMENTS/物件関連/JOB_MANAGE.ERB CASE,CASEELSEがない空のSELECTCASE～ENDSELECT。正気じゃない。
-                        sw.Write(new string('\t', curIndentLv));
-                        sw.WriteLine(l);
+                        ew.IndentLevel -= prevType == LineType.SelectCase ? 1 : 2; // eraTW ERB/MOVEMENTS/物件関連/JOB_MANAGE.ERB CASE,CASEELSEがない空のSELECTCASE～ENDSELECT。正気じゃない。
+                        ew.Write(el);
                         break;
 
                     case LineType.Sif:
                         {
-                            sw.Write(new string('\t', curIndentLv));
-                            sw.WriteLine(l);
+                            ew.Write(el);
 
                             // eratohoJ+ COMF140.ERB SIFの次にコメント行。しぬべき。
-                            var lst = new List<(LineType, string)>();
-                            while (!sr.EndOfStream)
+                            var lst = new List<IErbLine>();
+                            while (!er.EndOfReader)
                             {
-                                l = sr.ReadLine()!.TrimStart(); // !sr.EndOfStream. sr.ReadLine() returns string.
-                                t = new PseudoLexer(l).GetToken();
-                                lst.Add((t.Type, l));
-                                if (t.Type != LineType.Comment && t.Type != LineType.Blank && t.Type != LineType.StartRegionComment && t.Type != LineType.EndRegionComment)
+                                el = er.ReadLine()!;
+                                lst.Add(el);
+                                if (el.Type != LineType.Blank && el.Type != LineType.Comment && el.Type != LineType.StartRegionComment && el.Type != LineType.EndRegionComment)
                                     break;
                             }
                             foreach (var e in lst)
                             {
-                                switch (e.Item1)
+                                switch (e.Type)
                                 {
                                     case LineType.Blank:
-                                        sw.WriteLine();
+                                        ew.Write(e);
                                         break;
                                     default:
-                                        // Start/EndRegionCommentあたり怪しいかもしれない
-                                        sw.Write(new string('\t', curIndentLv + 1));
-                                        sw.WriteLine(e.Item2);
+                                        ew.Write(e, ew.IndentLevel + 1); // Start/EndRegionCommentあたり怪しいかもしれない
                                         break;
                                 }
                             }
@@ -186,23 +311,22 @@ namespace ERBPP
                     case LineType.Comment:
                     case LineType.StartRegionComment:
                         {
-                            var lst = new List<(LineType, string)> { (t.Type, l) };
-                            string nl;
-                            var nextType = LineType.Unknown;
-                            while (!sr.EndOfStream)
+                            var lst = new List<IErbLine> { el };
+                            IErbLine nextLine;
+                            LineType nextType = LineType.Unknown;
+                            while (!er.EndOfReader)
                             {
-                                nl = sr.ReadLine()!.TrimStart(); // !sr.EndOfStream. sr.ReadLine() returns string.
-                                var nt = new PseudoLexer(nl).GetToken();
-                                switch (nt.Type)
+                                nextLine = er.ReadLine()!;
+                                switch (nextLine.Type)
                                 {
                                     case LineType.Comment:
                                     case LineType.StartRegionComment:
                                     case LineType.EndRegionComment:
-                                        lst.Add((nt.Type, nl));
+                                        lst.Add(nextLine);
                                         break;
                                     default:
-                                        nextType = nt.Type;
-                                        l = nl;
+                                        el = nextLine;
+                                        nextType = nextLine.Type;
                                         goto READ_COMMENT_END;
                                 }
                             }
@@ -216,32 +340,30 @@ namespace ERBPP
                                 case LineType.EndSelect:
                                     foreach (var e in lst)
                                     {
-                                        if (e.Item1 == LineType.Blank)
+                                        //if (e.Item1 == LineType.Blank)
+                                        if (e.Type == LineType.Blank)
                                         {
-                                            sw.WriteLine();
+                                            //sw.WriteLine();
+                                            ew.Write(e);
                                         }
                                         else
                                         {
-                                            var indentLv = (nextType == LineType.Case || nextType == LineType.CaseElse) && prevType == LineType.SelectCase ? curIndentLv : Math.Max(0, curIndentLv - 1);
-                                            switch (e.Item1)
+                                            var indentLv = (nextType == LineType.Case || nextType == LineType.CaseElse) && prevType == LineType.SelectCase ? ew.IndentLevel : Math.Max(0, ew.IndentLevel - 1);
+                                            switch (e.Type)
                                             {
                                                 case LineType.StartRegionComment:
                                                     regionStack.Push(indentLv);
-                                                    sw.Write(new string('\t', indentLv));
-                                                    sw.WriteLine(e.Item2);
+                                                    ew.Write(e, indentLv);
                                                     break;
                                                 case LineType.EndRegionComment:
                                                     {
                                                         if (!regionStack.TryPop(out var res))
                                                             throw new FormatException("region/endregion stack err.");
-                                                        else
-                                                            sw.Write(new string('\t', res));
+                                                        ew.Write(e, res);
                                                     }
-                                                    sw.WriteLine(e.Item2);
                                                     break;
                                                 default:
-                                                    sw.Write(new string('\t', indentLv));
-                                                    sw.WriteLine(e.Item2);
+                                                    ew.Write(e, indentLv);
                                                     break;
                                             }
                                         }
@@ -250,51 +372,53 @@ namespace ERBPP
                                 default:
                                     foreach (var e in lst)
                                     {
-                                        switch (e.Item1)
+                                        switch (e.Type)
                                         {
                                             case LineType.Blank:
-                                                sw.WriteLine();
+                                                ew.Write(e);
                                                 break;
                                             case LineType.StartRegionComment:
-                                                regionStack.Push(curIndentLv);
-                                                sw.Write(new string('\t', curIndentLv));
-                                                sw.WriteLine(e.Item2);
+                                                regionStack.Push(ew.IndentLevel);
+                                                ew.Write(e);
                                                 break;
                                             case LineType.EndRegionComment:
                                                 {
                                                     if (!regionStack.TryPop(out var res))
                                                         throw new FormatException("region/endregion stack err.");
-                                                    else
-                                                        sw.Write(new string('\t', res));
+                                                    ew.Write(e, res);
                                                 }
-                                                sw.WriteLine(e.Item2);
                                                 break;
                                             default:
-                                                sw.Write(new string('\t', curIndentLv));
-                                                sw.WriteLine(e.Item2);
+                                                ew.Write(e);
                                                 break;
                                         }
                                     }
                                     break;
                             }
                         }
-                        if (sr.EndOfStream)
+                        if (er.EndOfReader)
                             goto READLINE_BREAK;
 
                         goto READLINE_REDO;
+                    case LineType.EndRegionComment:
+                        {
+                            if (!regionStack.TryPop(out var res))
+                                throw new FormatException("region/endregion stack err.");
+                            ew.Write(el, res);
+                        }
+                        break;
 
                     case LineType.Unknown:
-                        throw new FormatException($"unknown line type. ({l})");
+                        throw new FormatException($"unknown line type. ({el.RawString})");
 
                     default:
-                        sw.Write(new string('\t', curIndentLv));
-                        sw.WriteLine(l);
+                        ew.Write(el);
                         break;
                 }
 
-                if (t.Type != LineType.Blank && t.Type != LineType.Comment && t.Type != LineType.StartRegionComment && t.Type != LineType.EndRegionComment)
-                    prevType = t.Type;
-                sw.Flush();
+                if (el.Type != LineType.Blank && el.Type != LineType.Comment && el.Type != LineType.StartRegionComment && el.Type != LineType.EndRegionComment)
+                    prevType = el.Type;
+                ew.Flush();
             }
         READLINE_BREAK:
 
