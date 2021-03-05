@@ -46,7 +46,8 @@
         Label,
 
         /// <summary>
-        /// 特殊ブロック [SKIPSTART][SKIPEND]など https://ja.osdn.net/projects/emuera/wiki/exfunc#h3-.E7.89.B9.E6.AE.8A.E3.81.AA.E3.83.96.E3.83.AD.E3.83.83.E3.82.AF.E3.82.92.E8.A1.A8.E3.81.99.E8.A1.8C
+        /// <para>特殊ブロック [SKIPSTART][SKIPEND]など</para>
+        /// <para><see href="https://ja.osdn.net/projects/emuera/wiki/exfunc#h3-.E7.89.B9.E6.AE.8A.E3.81.AA.E3.83.96.E3.83.AD.E3.83.83.E3.82.AF.E3.82.92.E8.A1.A8.E3.81.99.E8.A1.8C">exfunc - Emuera - emulator of eramaker Wiki - Emuera - emulator of eramaker - OSDN</see></para>
         /// </summary>
         SpBlock,
 
@@ -124,7 +125,7 @@
         Variable,
 
         /// <summary>
-        /// ERHで定義されたグローバルなユーザ定義変数
+        /// ERHで定義されたグローバルなユーザ定義変数（と推定されるもの）
         /// </summary>
         ErhUserDefVariable,
 
