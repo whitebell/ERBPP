@@ -2,14 +2,198 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+#pragma warning disable CS0162 // Unreachable code detected
 
 namespace ERBPP
 {
+    public static class Constant
+    {
+        public const string Indent = "\t";
+        public const string ConcatBlockIndent = "\t";
+    }
+
+    public class ErbLineReader : IDisposable
+    {
+        private readonly StreamReader reader;
+
+        /// <summary>Gets a value that indicates whether the current read position is at the end of the reader.</summary>
+        /// <returns><see langword="true"/> if the current read position is at the end of the reader; otherwise <see langword="false"/>.</returns>
+        /// <exception cref="ObjectDisposedException">The underlying stream has been disposed.</exception>
+        public bool EndOfReader => reader.EndOfStream;
+
+        public ErbLineReader(Stream stream, Encoding encoding) => reader = new StreamReader(stream, encoding);
+
+        public IErbLine? ReadLine()
+        {
+            if (reader.EndOfStream)
+                return null;
+
+            var line = reader.ReadLine()!.TrimStart();
+            var t = new PseudoLexer(line).GetToken().Type;
+            if (t != LineType.StartConcat)
+                return new ErbLine(t, line);
+
+            var lst = new List<string> { line };
+            while (!reader.EndOfStream)
+            {
+                line = reader.ReadLine()!.TrimStart();
+                lst.Add(line);
+                t = new PseudoLexer(line).GetToken().Type;
+                if (t == LineType.EndConcat)
+                    return new ErbConcatLines(t, lst);
+                if (t != LineType.Blank)
+                    break;
+            }
+            while (!reader.EndOfStream)
+            {
+                line = reader.ReadLine()!.TrimStart();
+                if (line.StartsWith('}'))
+                {
+                    lst.Add(line);
+                    return new ErbConcatLines(t, lst);
+                }
+                lst.Add(Constant.ConcatBlockIndent + line);
+            }
+            throw new FormatException("line concat ({ ... }) hasn't been closed."); // EOSまでたどり着いたケース
+        }
+
+        #region IDisposable
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                // dispose managed resources
+                reader?.Dispose();
+            }
+
+            // dispose unmanaged resources
+        }
+
+        ~ErbLineReader() => Dispose(false);
+        #endregion
+    }
+
+    public class ErbLineWriter : IDisposable
+    {
+        private readonly StreamWriter writer;
+
+        public int IndentLevel { get; set; }
+
+        public bool AutoFlush
+        {
+            get => writer.AutoFlush;
+            set => writer.AutoFlush = value;
+        }
+
+        public ErbLineWriter(Stream stream, Encoding encoding) => writer = new StreamWriter(stream, encoding);
+
+        // erbLine.ToIndentStringは末尾改行付きで返すので、ここでWriteLineを使うと不要な改行が入る
+        public void Write(IErbLine erbLine) => writer.Write(erbLine.ToIndentString(IndentLevel));
+
+        #region IDisposable
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                // dispose managed resources
+                writer?.Dispose();
+            }
+
+            // dispose unmanaged resources
+        }
+
+        ~ErbLineWriter() => Dispose(false);
+        #endregion
+    }
+
+    public interface IErbLine
+    {
+        LineType Type { get; }
+
+
+        /// <summary><paramref name="indentLv"/>で指定した深さのインデント付き文字列を返す</summary>
+        /// <returns>インデントした改行付き文字列</returns>
+        string ToIndentString(int indentLv);
+    }
+
+    public class ErbLine : IErbLine
+    {
+        private readonly string line;
+
+        public LineType Type { get; init; }
+
+        public ErbLine(LineType type, string str)
+        {
+            Type = type;
+            line = str;
+        }
+
+        public string ToIndentString(int indentLv) => new StringBuilder().Insert(0, Constant.Indent, indentLv).AppendLine(line).ToString();
+    }
+
+    public class ErbConcatLines : IErbLine
+    {
+        private readonly List<string> lines;
+
+        public LineType Type { get; init; }
+
+        public ErbConcatLines(LineType type, IList<string> lines)
+        {
+            Type = type;
+            this.lines = new List<string>(lines);
+        }
+
+        public string ToIndentString(int indentLv)
+        {
+            var sb = new StringBuilder();
+            foreach (var l in lines)
+            {
+                if (String.IsNullOrWhiteSpace(l))
+                    sb.AppendLine();
+                else
+                    sb.Insert(sb.Length, Constant.Indent, indentLv).AppendLine(l);
+            }
+            return sb.ToString();
+        }
+    }
+
     public static class Program
     {
+        public static void Main2()
+        {
+            using var fr = File.Open(@"D:\Repository\whitebell\ERBPP\TESTCASE.ERB", FileMode.Open, FileAccess.Read);
+            using var er = new ErbLineReader(fr, Encoding.UTF8);
+            using var fw = File.Open(@"D:\Repository\whitebell\ERBPP\TESTCASE.PP.ERB", FileMode.Create, FileAccess.Write);
+            using var ew = new ErbLineWriter(fw, Encoding.UTF8) { AutoFlush = true };
+
+            IErbLine el;
+            var prevType = LineType.Unknown;
+
+            while (!er.EndOfReader)
+            {
+                el = er.ReadLine()!; // !er.EOR
+
+                ew.Write(el);
+            }
+        }
+
         public static void Main()
         {
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+            Main2();
+            return;
 #if DEBUG
             //using var fs = File.Open("D:\\Game\\eratoho\\EVENT_K14\\EVENT_K14.ERB", FileMode.Open, FileAccess.Read);
             using var fs = File.Open(@"D:\Repository\whitebell\ERBPP\TESTCASE.ERB", FileMode.Open, FileAccess.Read);
