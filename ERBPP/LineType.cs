@@ -2,6 +2,8 @@
 {
     public enum LineType
     {
+        Unknown = 0,
+
         /// <summary>
         /// 空行
         /// </summary>
@@ -127,7 +129,5 @@
         /// ERHで定義されたグローバルなユーザ定義変数
         /// </summary>
         ErhUserDefVariable,
-
-        Unknown,
     }
 }
