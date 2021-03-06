@@ -313,7 +313,7 @@ namespace ERBPP
                         {
                             var lst = new List<IErbLine> { el };
                             IErbLine nextLine;
-                            LineType nextType = LineType.Unknown;
+                            var nextType = LineType.Unknown;
                             while (!er.EndOfReader)
                             {
                                 nextLine = er.ReadLine()!;
