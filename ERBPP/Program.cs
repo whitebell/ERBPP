@@ -224,6 +224,10 @@ namespace ERBPP
                     case LineType.Unknown:
                         throw new FormatException($"unknown line type. ({el.RawString})");
 
+                    case LineType.StartConcat:
+                    case LineType.EndConcat:
+                        throw new ArgumentException(); // ErbConcatLineに内包されてしまっているはずなのでここにくるのは完全にバグ。
+
                     default:
                         ew.Write(el);
                         break;
