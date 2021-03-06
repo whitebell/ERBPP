@@ -340,10 +340,8 @@ namespace ERBPP
                                 case LineType.EndSelect:
                                     foreach (var e in lst)
                                     {
-                                        //if (e.Item1 == LineType.Blank)
                                         if (e.Type == LineType.Blank)
                                         {
-                                            //sw.WriteLine();
                                             ew.Write(e);
                                         }
                                         else
