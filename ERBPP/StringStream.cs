@@ -86,7 +86,7 @@ namespace Whitebell.Library.Utils
         public override int Read(byte[] buffer, int offset, int count)
         {
             if (_str.Length < offset + count)
-                throw new ArgumentOutOfRangeException($"{nameof(offset)} and/or {nameof(count)}" ,"The sum of offset and count is larger than the buffer length.");
+                throw new ArgumentOutOfRangeException($"{nameof(offset)} and/or {nameof(count)}", "The sum of offset and count is larger than the buffer length.");
 
             if (buffer == null)
                 throw new ArgumentNullException(nameof(buffer));

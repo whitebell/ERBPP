@@ -71,9 +71,9 @@ namespace ERBPP
 
                 return GetIdent().ToLower() switch
                 {
-                    "region"    => new Token(LineType.StartRegionComment),
+                    "region" => new Token(LineType.StartRegionComment),
                     "endregion" => new Token(LineType.EndRegionComment),
-                    _           => new Token(LineType.Comment),
+                    _ => new Token(LineType.Comment),
                 };
             }
             else if (IsFunctionStart(ss.Current))

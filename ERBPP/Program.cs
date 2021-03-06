@@ -47,6 +47,16 @@ namespace ERBPP
                             throw new FormatException("indented func def."); // 関数定義行でインデントされているのはおかしいので例外投げる
                         ew.Write(el);
                         break;
+                    case LineType.VariableDefinition:
+                        if (ew.IndentLevel != 0)
+                            throw new FormatException("indented var def."); // 変数定義行でインデントされているのはおかしいので例外投げる
+                        ew.Write(el);
+                        break;
+                    case LineType.Attribute:
+                        if (ew.IndentLevel != 0)
+                            throw new FormatException("indented attr def."); // 関数属性定義行でインデントされているのはおかしいので例外投げる
+                        ew.Write(el);
+                        break;
 
                     case LineType.If:
                     case LineType.Repeat:
@@ -67,7 +77,7 @@ namespace ERBPP
                     case LineType.ElseIf:
                     case LineType.Else:
                     case LineType.Catch:
-                        ew.Write(el, ew.IndentLevel- 1);
+                        ew.Write(el, ew.IndentLevel - 1);
                         break;
                     case LineType.Endif:
                     case LineType.Rend:
