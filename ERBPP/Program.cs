@@ -98,7 +98,7 @@ namespace ERBPP
                     case LineType.Case:
                     case LineType.CaseElse:
                         if (prevType == LineType.SelectCase)
-                            ew.Write(el, ew.IndentLevel++); // LineType.CaseElseでここにくるのは正気じゃないと思うが、実例があるのでしょうがない。eratohoJ+ REVMODE.ERB
+                            ew.Write(el, ew.IndentLevel++); // LineType.CaseElseでここにくるのは、SELECTCASE中にCASEがなく、CASEELSEのみのケース。正気じゃないと思うが、実例があるのでしょうがない。eratohoJ+ REVMODE.ERB
                         else
                             ew.Write(el, ew.IndentLevel - 1);
                         break;
@@ -115,6 +115,9 @@ namespace ERBPP
                             ew.Write(el);
 
                             // eratohoJ+ COMF140.ERB SIFの次にコメント行。しぬべき。
+                            // Emueraとmakerで仕様に差があり、Emueraはコメント行・空行を無視して有効な命令の行を処理する。
+                            // Emueraに合わせたインデントをかける。
+                            // https://ja.osdn.net/projects/emuera/wiki/diff#h5-SIF.E3.81.AE.E7.9B.B4.E5.BE.8C.E3.81.8C.E7.A9.BA.E8.A1.8C.E3.83.BB.E3.82.B3.E3.83.A1.E3.83.B3.E3.83.88.E8.A1.8C.E3.81.AA.E3.81.A9.E3.81.A7.E3.81.82.E3.82.8B.E5.A0.B4.E5.90.88
                             var lst = new List<IErbLine>();
                             while (!er.EndOfReader)
                             {
