@@ -15,7 +15,12 @@ namespace ERBPP
     {
         public static void Main()
         {
-            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+            // .NET環境ではUS-ASCII, ISO-8859-1, UTF-8, UTF-16LE/BE, UTF-32LE/BEのみ
+            //foreach (var ei in Encoding.GetEncodings())
+            //    Console.WriteLine($"{ei.DisplayName}\t{ei.CodePage}\t{ei.Name}");
+            // Shift_JISなど他のエンコーディングが必要な時はnugetからSystem.Text.Encoding.CodePagesをインストールして下の行を有効にする
+            // あとは適当に実装する
+            //Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
 #if DEBUG
             //using var fr = File.Open("D:\\Game\\eratoho\\EVENT_K14\\EVENT_K14.ERB", FileMode.Open, FileAccess.Read);
