@@ -34,6 +34,7 @@ namespace ERBPP
                     return new ErbLine(t, line);
             }
 
+            // Concat Block
             var lst = new List<string> { line };
             while (!reader.EndOfStream)
             {
@@ -41,7 +42,7 @@ namespace ERBPP
                 lst.Add(line);
                 t = new PseudoLexer(line).GetToken().Type;
                 if (t == LineType.EndConcat)
-                    return new ErbConcatLines(t, lst);
+                    return new ErbConcatLines(LineType.Blank, lst); // Blank {}
                 if (t != LineType.Blank)
                     break;
             }
