@@ -18,9 +18,8 @@ namespace ERBPP
 
         public ErbLineWriter(Stream stream, Encoding encoding) => writer = new StreamWriter(stream, encoding);
 
-        // erbLine.ToIndentStringは末尾改行付きで返すので、ここでWriteLineを使うと不要な改行が入る
-        public void Write(IErbLine erbLine) => Write(erbLine, IndentLevel);
-
+        // erbLine.ToIndentStringは末尾改行付きで返すので、ここでStreamWriter.WriteLineを使うと不要な改行が入る
+        public void Write(IErbLine erbLine) => writer.Write(erbLine.ToIndentString(IndentLevel));
         public void Write(IErbLine erbLine, int indentLv) => writer.Write(erbLine.ToIndentString(indentLv));
 
         /// <summary>Clears all buffers for the current writer and causes any buffered data to be written to the underlying stream.</summary>
