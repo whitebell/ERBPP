@@ -15,7 +15,7 @@ namespace ERBPP
             set
             {
                 if (value < 0)
-                    throw new ArgumentException($"{nameof(value)} is less than zero.");
+                    throw new ArgumentOutOfRangeException(nameof(value), $"{nameof(value)} is less than zero.");
                 indentLevel = value;
             }
         }

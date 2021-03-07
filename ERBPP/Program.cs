@@ -186,7 +186,7 @@ namespace ERBPP
                                         ew.Write(e, indentLv);
                                         break;
                                     default:
-                                        throw new InvalidOperationException();
+                                        throw new InvalidOperationException("unknown type.");
                                 }
                             }
                         }
@@ -203,11 +203,11 @@ namespace ERBPP
                         break;
 
                     case LineType.Unknown:
-                        throw new FormatException($"unknown line type. ({el.RawString})");
+                        throw new InvalidOperationException($"unknown line type. ({el.RawString})");
 
                     case LineType.StartConcat:
                     case LineType.EndConcat:
-                        throw new ArgumentException(); // ErbConcatLineに内包されてしまっているはずなのでここにくるのは完全にバグ。
+                        throw new InvalidOperationException(); // ErbConcatLineに内包されてしまっているはずなのでここにくるのは完全にバグ。
 
                     default:
                         ew.Write(el);
