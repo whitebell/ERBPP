@@ -154,26 +154,14 @@ namespace ERBPP
                     case LineType.StartRegionComment:
                         {
                             var lst = new List<IErbLine> { el };
-                            IErbLine nextLine;
-                            var nextType = LineType.Unknown;
                             while (!er.EndOfReader)
                             {
-                                nextLine = er.ReadLine()!;
-                                switch (nextLine.Type)
-                                {
-                                    case LineType.Comment:
-                                    case LineType.StartRegionComment:
-                                    case LineType.EndRegionComment:
-                                        lst.Add(nextLine);
-                                        break;
-                                    default:
-                                        el = nextLine;
-                                        nextType = nextLine.Type;
-                                        goto READ_COMMENT_END;
-                                }
+                                el = er.ReadLine()!;
+                                if (el.Type is not LineType.Comment and not LineType.StartRegionComment and not LineType.EndRegionComment)
+                                    break;
+                                lst.Add(el);
                             }
-                        READ_COMMENT_END:
-                            switch (nextType)
+                            switch (el.Type)
                             {
                                 case LineType.ElseIf:
                                 case LineType.Else:
