@@ -10,40 +10,40 @@
         Blank,
 
         /// <summary>
-        /// コメント行
+        /// コメント行 ;COMMENT
         /// </summary>
         Comment,
 
         /// <summary>
-        /// リージョンコメント開始
+        /// リージョンコメント開始 ;region, ;#region
         /// </summary>
         StartRegionComment,
         /// <summary>
-        /// リージョンコメント終了
+        /// リージョンコメント終了 ;endregion, ;#endregion
         /// </summary>
         EndRegionComment,
 
         /// <summary>
-        /// 行連結開始 '{'
+        /// 行連結開始 {
         /// </summary>
         StartConcat,
         /// <summary>
-        /// 行連結終了 '}'
+        /// 行連結終了 }
         /// </summary>
         EndConcat,
 
         /// <summary>
-        /// 関数定義
+        /// 関数定義 @FUNCTION
         /// </summary>
         FunctionDefinition,
 
         /// <summary>
-        /// 関数属性 PRI, LATER, etc...
+        /// 関数属性 #PRI, #LATER, etc...
         /// </summary>
         Attribute,
 
         /// <summary>
-        /// ラベル行
+        /// ラベル行 $LABEL
         /// </summary>
         Label,
 
@@ -53,6 +53,9 @@
         /// </summary>
         SpBlock,
 
+        /// <summary>
+        /// 変数定義 #DIM, #DIMS
+        /// </summary>
         VariableDefinition,
 
         Sif,
@@ -122,7 +125,7 @@
         BuiltinFunction,
 
         /// <summary>
-        /// 変数
+        /// 組み込み変数、関数ローカルのユーザ定義変数
         /// </summary>
         Variable,
 
