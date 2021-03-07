@@ -48,18 +48,27 @@ namespace ERBPP
                         break;
 
                     case LineType.FunctionDefinition:
+                        // 関数定義行でインデントされているのはおかしいので例外投げる
                         if (ew.IndentLevel != 0)
-                            throw new FormatException("indented func def."); // 関数定義行でインデントされているのはおかしいので例外投げる
+                            throw new FormatException("indented func def.");
                         ew.Write(el);
                         break;
                     case LineType.VariableDefinition:
+                        // 変数定義行でインデントされているのはおかしいので例外投げる
                         if (ew.IndentLevel != 0)
-                            throw new FormatException("indented var def."); // 変数定義行でインデントされているのはおかしいので例外投げる
+                            throw new FormatException("indented var def.");
+                        // 関数の先頭で定義されなければいけない
+                        if (prevType is not LineType.FunctionDefinition and not LineType.VariableDefinition and not LineType.Attribute)
+                            throw new FormatException("User-defined variable must be defined at the beginning of the function.");
                         ew.Write(el);
                         break;
                     case LineType.Attribute:
+                        // 関数属性定義行でインデントされているのはおかしいので例外投げる
                         if (ew.IndentLevel != 0)
-                            throw new FormatException("indented attr def."); // 関数属性定義行でインデントされているのはおかしいので例外投げる
+                            throw new FormatException("indented attr def.");
+                        // 関数の先頭で定義されなければいけない
+                        if (prevType is not LineType.FunctionDefinition and not LineType.VariableDefinition and not LineType.Attribute)
+                            throw new FormatException("function attribute must be defined at the beginning of the function.");
                         ew.Write(el);
                         break;
 
