@@ -161,57 +161,33 @@ namespace ERBPP
                                     break;
                                 lst.Add(el);
                             }
-                            switch (el.Type)
+                            var indentLv = el.Type switch
                             {
-                                case LineType.ElseIf:
-                                case LineType.Else:
-                                case LineType.Case:
-                                case LineType.CaseElse:
-                                case LineType.EndSelect:
-                                    foreach (var e in lst)
-                                    {
-                                        var indentLv = (el.Type == LineType.Case || el.Type == LineType.CaseElse) && prevType == LineType.SelectCase ? ew.IndentLevel : Math.Max(0, ew.IndentLevel - 1);
-                                        switch (e.Type)
+                                LineType.ElseIf or LineType.Else or LineType.EndSelect => ew.IndentLevel - 1,
+                                LineType.Case or LineType.CaseElse => prevType == LineType.SelectCase ? ew.IndentLevel : ew.IndentLevel - 1,
+                                _ => ew.IndentLevel,
+                            };
+                            foreach (var e in lst)
+                            {
+                                switch (e.Type)
+                                {
+                                    case LineType.StartRegionComment:
+                                        regionStack.Push(indentLv);
+                                        ew.Write(e, indentLv);
+                                        break;
+                                    case LineType.EndRegionComment:
                                         {
-                                            case LineType.StartRegionComment:
-                                                regionStack.Push(indentLv);
-                                                ew.Write(e, indentLv);
-                                                break;
-                                            case LineType.EndRegionComment:
-                                                {
-                                                    if (!regionStack.TryPop(out var res))
-                                                        throw new FormatException("region/endregion stack err.");
-                                                    ew.Write(e, res);
-                                                }
-                                                break;
-                                            default:
-                                                ew.Write(e, indentLv);
-                                                break;
+                                            if (!regionStack.TryPop(out var res))
+                                                throw new FormatException("region/endregion stack err.");
+                                            ew.Write(e, res);
                                         }
-                                    }
-                                    break;
-                                default:
-                                    foreach (var e in lst)
-                                    {
-                                        switch (e.Type)
-                                        {
-                                            case LineType.StartRegionComment:
-                                                regionStack.Push(ew.IndentLevel);
-                                                ew.Write(e);
-                                                break;
-                                            case LineType.EndRegionComment:
-                                                {
-                                                    if (!regionStack.TryPop(out var res))
-                                                        throw new FormatException("region/endregion stack err.");
-                                                    ew.Write(e, res);
-                                                }
-                                                break;
-                                            default:
-                                                ew.Write(e);
-                                                break;
-                                        }
-                                    }
-                                    break;
+                                        break;
+                                    case LineType.Comment:
+                                        ew.Write(e, indentLv);
+                                        break;
+                                    default:
+                                        throw new InvalidOperationException();
+                                }
                             }
                         }
                         if (er.EndOfReader)
