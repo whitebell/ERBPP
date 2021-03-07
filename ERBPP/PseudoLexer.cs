@@ -22,13 +22,6 @@ namespace ERBPP
                 ss.NextChar(out _);
         }
 
-        //private void Skip(int i)
-        //{
-        //    var s = 0;
-        //    while (!ss.EndOfStream && s++ < i)
-        //        ss.NextChar(out _);
-        //}
-
         private void Consume(char c)
         {
             if (!ss.EndOfStream && ss.Current == c)
@@ -129,8 +122,6 @@ namespace ERBPP
                 {
                     case "SKIPSTART":
                     case "SKIPEND":
-                    //case "IF":
-                    //case "ELSEIF":
                     case "ELSE":
                     case "ENDIF":
                     case "IF_DEBUG":
@@ -790,21 +781,18 @@ namespace ERBPP
                         if (IsVariableSeparator(ss.Current) || ss.Current == '=')
                         {
                             // VAR:XXX ... , VAR = ...
-                            //Console.Error.WriteLine($"parse \"{ident}\" as global UDV.");
                             erhGlobalUdv.Add(ident.ToUpper());
                             return new Token(LineType.ErhUserDefVariable);
                         }
                         else if ((ss.Current == '+' || ss.Current == '-' || ss.Current == '*' || ss.Current == '/' || ss.Current == '\'') && ss.Peek(1) == '=')
                         {
                             // VAR += n, VAR -= n, VAR *= n, VAR /= n, VAR '= "..."
-                            //Console.Error.WriteLine($"parse \"{ident}\" as global UDV.");
                             erhGlobalUdv.Add(ident.ToUpper());
                             return new Token(LineType.ErhUserDefVariable);
                         }
                         else if ((ss.Current == '+' || ss.Current == '-') && ss.Peek(1) == ss.Current)
                         {
                             // VAR++, VAR--
-                            //Console.Error.WriteLine($"parse \"{ident}\" as global UDV.");
                             erhGlobalUdv.Add(ident.ToUpper());
                             return new Token(LineType.ErhUserDefVariable);
                         }
