@@ -182,30 +182,23 @@ namespace ERBPP
                                 case LineType.EndSelect:
                                     foreach (var e in lst)
                                     {
-                                        if (e.Type == LineType.Blank)
+                                        var indentLv = (el.Type == LineType.Case || el.Type == LineType.CaseElse) && prevType == LineType.SelectCase ? ew.IndentLevel : Math.Max(0, ew.IndentLevel - 1);
+                                        switch (e.Type)
                                         {
-                                            ew.Write(e);
-                                        }
-                                        else
-                                        {
-                                            var indentLv = (nextType == LineType.Case || nextType == LineType.CaseElse) && prevType == LineType.SelectCase ? ew.IndentLevel : Math.Max(0, ew.IndentLevel - 1);
-                                            switch (e.Type)
-                                            {
-                                                case LineType.StartRegionComment:
-                                                    regionStack.Push(indentLv);
-                                                    ew.Write(e, indentLv);
-                                                    break;
-                                                case LineType.EndRegionComment:
-                                                    {
-                                                        if (!regionStack.TryPop(out var res))
-                                                            throw new FormatException("region/endregion stack err.");
-                                                        ew.Write(e, res);
-                                                    }
-                                                    break;
-                                                default:
-                                                    ew.Write(e, indentLv);
-                                                    break;
-                                            }
+                                            case LineType.StartRegionComment:
+                                                regionStack.Push(indentLv);
+                                                ew.Write(e, indentLv);
+                                                break;
+                                            case LineType.EndRegionComment:
+                                                {
+                                                    if (!regionStack.TryPop(out var res))
+                                                        throw new FormatException("region/endregion stack err.");
+                                                    ew.Write(e, res);
+                                                }
+                                                break;
+                                            default:
+                                                ew.Write(e, indentLv);
+                                                break;
                                         }
                                     }
                                     break;
@@ -214,9 +207,6 @@ namespace ERBPP
                                     {
                                         switch (e.Type)
                                         {
-                                            case LineType.Blank:
-                                                ew.Write(e);
-                                                break;
                                             case LineType.StartRegionComment:
                                                 regionStack.Push(ew.IndentLevel);
                                                 ew.Write(e);
