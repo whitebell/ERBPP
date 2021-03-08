@@ -100,9 +100,7 @@ namespace ERBPP
                                 SkipSpace();
                                 v = GetIdent().ToUpper();
                             }
-                            if (!functionLocalUdv.Contains(v))
-                                functionLocalUdv.Add(v);
-                            return new Token(LineType.VariableDefinition);
+                            return functionLocalUdv.Add(v) ? new Token(LineType.VariableDefinition) : throw new FormatException($"{v} is already defined.");
                         }
                     default:
                         throw new FormatException($"unknown attribute. ({ident})");
