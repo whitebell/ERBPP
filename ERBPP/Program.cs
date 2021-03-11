@@ -50,25 +50,25 @@ namespace ERBPP
                     case LineType.FunctionDefinition:
                         // 関数定義行でインデントされているのはおかしいので例外投げる
                         if (ew.IndentLevel != 0)
-                            throw new FormatException("indented func def.");
+                            throw new FormatException($"indented func def. ({er.Position})");
                         ew.Write(el);
                         break;
                     case LineType.VariableDefinition:
                         // 変数定義行でインデントされているのはおかしいので例外投げる
                         if (ew.IndentLevel != 0)
-                            throw new FormatException("indented var def.");
+                            throw new FormatException($"indented var def. ({er.Position})");
                         // 関数の先頭で定義されなければいけない
                         if (prevType is not LineType.FunctionDefinition and not LineType.VariableDefinition and not LineType.Attribute)
-                            throw new FormatException("User-defined variable must be defined at the beginning of the function.");
+                            throw new FormatException($"User-defined variable must be defined at the beginning of the function. ({er.Position})");
                         ew.Write(el);
                         break;
                     case LineType.Attribute:
                         // 関数属性定義行でインデントされているのはおかしいので例外投げる
                         if (ew.IndentLevel != 0)
-                            throw new FormatException("indented attr def.");
+                            throw new FormatException($"indented attr def. ({er.Position})");
                         // 関数の先頭で定義されなければいけない
                         if (prevType is not LineType.FunctionDefinition and not LineType.VariableDefinition and not LineType.Attribute)
-                            throw new FormatException("function attribute must be defined at the beginning of the function.");
+                            throw new FormatException($"function attribute must be defined at the beginning of the function. ({er.Position})");
                         ew.Write(el);
                         break;
 
@@ -178,7 +178,7 @@ namespace ERBPP
                                     case LineType.EndRegionComment:
                                         {
                                             if (!regionStack.TryPop(out var res))
-                                                throw new FormatException("region/endregion stack err.");
+                                                throw new FormatException($"region/endregion stack err. ({er.Position})");
                                             ew.Write(e, res);
                                         }
                                         break;
@@ -186,7 +186,7 @@ namespace ERBPP
                                         ew.Write(e, indentLv);
                                         break;
                                     default:
-                                        throw new InvalidOperationException("unknown type.");
+                                        throw new InvalidOperationException($"unknown type. ({er.Position})");
                                 }
                             }
                         }
@@ -197,13 +197,13 @@ namespace ERBPP
                     case LineType.EndRegionComment:
                         {
                             if (!regionStack.TryPop(out var res))
-                                throw new FormatException("region/endregion stack err.");
+                                throw new FormatException($"region/endregion stack err. ({er.Position})");
                             ew.Write(el, res);
                         }
                         break;
 
                     case LineType.Unknown:
-                        throw new InvalidOperationException($"unknown line type. ({el.RawString})");
+                        throw new InvalidOperationException($"unknown line type. ({el.RawString})  ({er.Position})");
 
                     case LineType.StartConcat:
                     case LineType.EndConcat:
