@@ -14,6 +14,12 @@ namespace ERBPP
         /// <exception cref="ObjectDisposedException">The underlying stream has been disposed.</exception>
         public bool EndOfReader => reader.EndOfStream;
 
+        public string? Path => (reader.BaseStream as FileStream)?.Name;
+
+        public int LineNum { get; private set; }
+
+        public string Position => Path is null ? $"line.{LineNum}" : $"line.{LineNum} ({Path})";
+
         /// <summary>Initializes a new instance of the <see cref="ErbLineReader"/> class for the specified stream, with the specified character encoding.</summary>
         /// <param name="stream">The stream to be read.</param>
         /// <param name="encoding">The character encoding to use.</param>
@@ -32,6 +38,7 @@ namespace ERBPP
                 return null;
 
             var line = reader.ReadLine()!.TrimStart();
+            LineNum++;
             var t = new PseudoLexer(line).GetToken().Type;
 
             switch (t)
@@ -49,6 +56,7 @@ namespace ERBPP
             while (!reader.EndOfStream)
             {
                 line = reader.ReadLine()!.TrimStart();
+                LineNum++;
                 lst.Add(line);
                 t = new PseudoLexer(line).GetToken().Type;
                 if (t == LineType.EndConcat)
@@ -59,6 +67,7 @@ namespace ERBPP
             while (!reader.EndOfStream)
             {
                 line = reader.ReadLine()!.TrimStart();
+                LineNum++;
                 if (line.StartsWith('}'))
                 {
                     lst.Add(line);
