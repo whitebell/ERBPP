@@ -43,7 +43,8 @@ namespace ERBPP
                 {
                     el = er.ReadLine()!; // !er.EOR
                 }
-                catch (FormatException e) {
+                catch (FormatException e)
+                {
                     throw new FormatException(e.Message + $" ({er.Position})", e);
                 }
             READLINE_REDO:

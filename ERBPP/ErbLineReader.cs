@@ -14,11 +14,15 @@ namespace ERBPP
         /// <exception cref="ObjectDisposedException">The underlying stream has been disposed.</exception>
         public bool EndOfReader => reader.EndOfStream;
 
-        public string? Path => (reader.BaseStream as FileStream)?.Name;
-
         public int LineNum { get; private set; }
 
+#if DEBUG
         public string Position => Path is null ? $"line.{LineNum}" : $"line.{LineNum} ({Path})";
+
+        public string? Path => (reader.BaseStream as FileStream)?.Name;
+#else
+        public string Position => $"line.{LineNum}";
+#endif
 
         /// <summary>Initializes a new instance of the <see cref="ErbLineReader"/> class for the specified stream, with the specified character encoding.</summary>
         /// <param name="stream">The stream to be read.</param>
@@ -78,7 +82,7 @@ namespace ERBPP
             throw new FormatException("line concat ({ ... }) hasn't been closed."); // EOSまでたどり着いたケース
         }
 
-        #region IDisposable
+#region IDisposable
         /// <summary>Releases all resources used by the <see cref="ErbLineReader"/> object.</summary>
         public void Dispose()
         {
@@ -102,6 +106,6 @@ namespace ERBPP
         }
 
         ~ErbLineReader() => Dispose(false);
-        #endregion
+#endregion
     }
 }
