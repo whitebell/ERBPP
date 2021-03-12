@@ -39,7 +39,13 @@ namespace ERBPP
             var regionStack = new Stack<int>();
             while (!er.EndOfReader)
             {
-                el = er.ReadLine()!; // !er.EOR
+                try
+                {
+                    el = er.ReadLine()!; // !er.EOR
+                }
+                catch (FormatException e) {
+                    throw new FormatException(e.Message + $" ({er.Position})", e);
+                }
             READLINE_REDO:
                 switch (el.Type)
                 {
@@ -130,7 +136,12 @@ namespace ERBPP
                             var lst = new List<IErbLine>();
                             while (!er.EndOfReader)
                             {
-                                el = er.ReadLine()!;
+                                try
+                                {
+                                    el = er.ReadLine()!; // !er.EOR
+                                }
+                                catch (FormatException e) { throw new FormatException(e.Message + $" ({er.Position})", e); }
+
                                 lst.Add(el);
                                 if (el.Type != LineType.Blank && el.Type != LineType.Comment && el.Type != LineType.StartRegionComment && el.Type != LineType.EndRegionComment)
                                     break;
@@ -156,7 +167,11 @@ namespace ERBPP
                             var lst = new List<IErbLine> { el };
                             while (!er.EndOfReader)
                             {
-                                el = er.ReadLine()!;
+                                try
+                                {
+                                    el = er.ReadLine()!;
+                                }
+                                catch (FormatException e) { throw new FormatException(e.Message + $" ({er.Position})", e); }
                                 if (el.Type is not LineType.Comment and not LineType.StartRegionComment and not LineType.EndRegionComment)
                                     break;
                                 lst.Add(el);
