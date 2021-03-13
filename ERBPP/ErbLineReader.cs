@@ -17,9 +17,7 @@ namespace ERBPP
         public int LineNum { get; private set; }
 
 #if DEBUG
-        public string Position => Path is null ? $"line.{LineNum}" : $"line.{LineNum} ({Path})";
-
-        public string? Path => (reader.BaseStream as FileStream)?.Name;
+        public string Position => reader.BaseStream is FileStream fs ? $"line.{LineNum} ({fs.Name})" : $"line.{LineNum}";
 #else
         public string Position => $"line.{LineNum}";
 #endif
