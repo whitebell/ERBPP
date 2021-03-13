@@ -10,11 +10,16 @@ namespace ERBPP
     public class PseudoLexer
     {
         private readonly StringStream ss;
+        private readonly string position;
 
         private static readonly HashSet<string> functionLocalUdv = new();
         private static readonly HashSet<string> erhGlobalUdv = new();
 
-        public PseudoLexer(string s) => ss = new StringStream(s.TrimEnd('\r', '\n'));
+        public PseudoLexer(string s, string position)
+        {
+            ss = new StringStream(s.TrimEnd('\r', '\n'));
+            this.position = position;
+        }
 
         private void SkipSpace()
         {
@@ -100,10 +105,10 @@ namespace ERBPP
                                 SkipSpace();
                                 v = GetIdent().ToUpper();
                             }
-                            return functionLocalUdv.Add(v) ? new Token(LineType.VariableDefinition) : throw new FormatException($"{v} is already defined.");
+                            return functionLocalUdv.Add(v) ? new Token(LineType.VariableDefinition) : throw new FormatException($"{v} is already defined. ({position})");
                         }
                     default:
-                        throw new FormatException($"unknown attribute. ({ident})");
+                        throw new FormatException($"unknown attribute. ({ident}) ({position})");
                 }
             }
             else if (IsLabelStart(ss.Current))
@@ -124,15 +129,15 @@ namespace ERBPP
                     case "ENDIF":
                     case "IF_DEBUG":
                     case "IF_NDEBUG":
-                        return IsSpBlockEnd(ss.Current) ? new Token(LineType.SpBlock) : throw new FormatException($"unknown spblock: {ident}");
+                        return IsSpBlockEnd(ss.Current) ? new Token(LineType.SpBlock) : throw new FormatException($"unknown spblock: {ident} ({position})");
                     case "IF":
                     case "ELSEIF":
                         SkipSpace();
                         GetIdent();
                         SkipSpace();
-                        return IsSpBlockEnd(ss.Current) ? new Token(LineType.SpBlock) : throw new FormatException($"unknown spblock: {ident}");
+                        return IsSpBlockEnd(ss.Current) ? new Token(LineType.SpBlock) : throw new FormatException($"unknown spblock: {ident} ({position})");
                     default:
-                        throw new FormatException($"unknown spblock: {ident}");
+                        throw new FormatException($"unknown spblock: {ident} ({position})");
                 }
             }
             else if (IsConcatStart(ss.Current))
@@ -146,7 +151,7 @@ namespace ERBPP
             else if (IsIncr(ss.Current))
             {
                 if (!IsIncr(ss.Peek(1)))
-                    throw new FormatException($"can't parse. {ss.RawString}");
+                    throw new FormatException($"can't parse. {ss.RawString} ({position})");
 
                 Consume('+');
                 Consume('+');
@@ -155,13 +160,13 @@ namespace ERBPP
                 return t.Type switch
                 {
                     LineType.Variable or LineType.ErhUserDefVariable => new Token(t.Type),
-                    _ => throw new FormatException("incr op. + nonvariable"),
+                    _ => throw new FormatException($"incr op. + nonvariable ({position})"),
                 };
             }
             else if (IsDecr(ss.Current))
             {
                 if (!IsDecr(ss.Peek(1)))
-                    throw new FormatException($"can't parse. {ss.RawString}");
+                    throw new FormatException($"can't parse. {ss.RawString} ({position})");
 
                 Consume('-');
                 Consume('-');
@@ -170,7 +175,7 @@ namespace ERBPP
                 return t.Type switch
                 {
                     LineType.Variable or LineType.ErhUserDefVariable => new Token(t.Type),
-                    _ => throw new FormatException("decr op. + nonvariable"),
+                    _ => throw new FormatException($"decr op. + nonvariable ({position})"),
                 };
             }
             else
@@ -797,7 +802,7 @@ namespace ERBPP
                         else
                         {
                             // 扱いが変数っぽく見えない本当に不明なもの
-                            throw new FormatException($"unknown ident name ({(String.IsNullOrWhiteSpace(ident) ? ss.RawString : ident)})");
+                            throw new FormatException($"unknown ident name ({(String.IsNullOrWhiteSpace(ident) ? ss.RawString : ident)}) ({position})");
                         }
                 }
             }

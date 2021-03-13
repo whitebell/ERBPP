@@ -41,7 +41,7 @@ namespace ERBPP
 
             var line = reader.ReadLine()!.TrimStart();
             LineNum++;
-            var t = new PseudoLexer(line).GetToken().Type;
+            var t = new PseudoLexer(line, Position).GetToken().Type;
 
             switch (t)
             {
@@ -60,7 +60,7 @@ namespace ERBPP
                 line = reader.ReadLine()!.TrimStart();
                 LineNum++;
                 lst.Add(line);
-                t = new PseudoLexer(line).GetToken().Type;
+                t = new PseudoLexer(line, Position).GetToken().Type;
                 if (t == LineType.EndConcat)
                     return new ErbConcatLines(LineType.Blank, lst); // Blank {}
                 if (t != LineType.Blank)
