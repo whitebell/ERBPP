@@ -39,14 +39,7 @@ namespace ERBPP
             var regionStack = new Stack<int>();
             while (!er.EndOfReader)
             {
-                try
-                {
-                    el = er.ReadLine()!; // !er.EOR
-                }
-                catch (FormatException e)
-                {
-                    throw new FormatException(e.Message + $" ({er.Position})", e);
-                }
+                el = er.ReadLine()!; // !er.EOR
             READLINE_REDO:
                 switch (el.Type)
                 {

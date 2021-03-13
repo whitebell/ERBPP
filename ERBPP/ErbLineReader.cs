@@ -77,7 +77,7 @@ namespace ERBPP
                 }
                 lst.Add(Constant.ConcatBlockIndent + line);
             }
-            throw new FormatException("line concat ({ ... }) hasn't been closed."); // EOSまでたどり着いたケース
+            throw new FormatException($"line concat ({{ ... }}) hasn't been closed. ({Position})"); // EOSまでたどり着いたケース
         }
 
 #region IDisposable
