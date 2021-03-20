@@ -36,12 +36,12 @@ namespace ERBPP
         private string GetIdent()
         {
             var sb = new StringBuilder();
-            if (!ss.EndOfStream && IsIdentCharFirst(ss.Current) && !IsVariableSeparator(ss.Current))
+            if (!ss.EndOfStream && IsIdentifierFirstChar(ss.Current) && !IsVariableSeparator(ss.Current))
             {
                 ss.NextChar(out var c);
                 sb.Append(c);
             }
-            while (!ss.EndOfStream && IsIdentChar(ss.Current) && !IsVariableSeparator(ss.Current))
+            while (!ss.EndOfStream && IsIdentifierChar(ss.Current) && !IsVariableSeparator(ss.Current))
             {
                 ss.NextChar(out var c);
                 sb.Append(c);
@@ -813,8 +813,8 @@ namespace ERBPP
         private static bool IsAttributeStart(char c) => c == '#';
         private static bool IsVariableSeparator(char c) => c == ':';
         private static bool IsLabelStart(char c) => c == '$';
-        private static bool IsIdentCharFirst(char c) => c == '_' || Char.IsLetter(c);
-        private static bool IsIdentChar(char c) => c == '_' || Char.IsLetterOrDigit(c);
+        private static bool IsIdentifierFirstChar(char c) => c == '_' || Char.IsLetter(c);
+        private static bool IsIdentifierChar(char c) => c == '_' || Char.IsLetterOrDigit(c);
         private static bool IsIncr(char c) => c == '+';
         private static bool IsDecr(char c) => c == '-';
         private static bool IsSpBlockStart(char c) => c == '[';
