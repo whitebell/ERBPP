@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 
 namespace Whitebell.Library.Utils
@@ -57,6 +58,7 @@ namespace Whitebell.Library.Utils
         }
 
         /// <summary>内部文字列を取得します。</summary>
+        [SuppressMessage("Simplification", "RCS1085:Use auto-implemented property.", Justification = "<Pending>")]
         public string RawString => _str;
 
         #endregion
@@ -78,23 +80,26 @@ namespace Whitebell.Library.Utils
         /// <returns>32 ビット符号付整数ハッシュコード</returns>
         public override int GetHashCode() => _str.GetHashCode();
 
-        /// <param name="buffer"></param>
-        /// <param name="offset"></param>
-        /// <param name="count"></param>
-        /// <exception cref="ArgumentOutOfRangeException"></exception>
-        /// <exception cref="ArgumentNullException"></exception>
+        /// <summary>Reads a sequence of bytes from the current stream and advances the position within the stream by the number of bytes read.</summary>
+        /// <param name="buffer">An array of bytes. When this method returns, the buffer contains the specified byte array with the values between offset and (offset + count - 1) replaced by the bytes read from the current source.</param>
+        /// <param name="offset">The zero-based byte offset in buffer at which to begin storing the data read from the current stream.</param>
+        /// <param name="count">The maximum number of bytes to be read from the current stream.</param>
+        /// <returns>The total number of bytes read into the buffer. This can be less than the number of bytes requested if that many bytes are not currently available, or zero (0) if the end of the stream has been reached.</returns>
+        /// <exception cref="ArgumentException">The sum of offset and count is larger than the buffer length.</exception>
+        /// <exception cref="ArgumentNullException">buffer is null.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">offset or count is negative.</exception>
         public override int Read(byte[] buffer, int offset, int count)
         {
             if (_str.Length < offset + count)
-                throw new ArgumentOutOfRangeException($"{nameof(offset)} and/or {nameof(count)}", "The sum of offset and count is larger than the buffer length.");
+                throw new ArgumentException($"The sum of {nameof(offset)} and {nameof(count)} is larger than the buffer length.");
 
-            if (buffer == null)
-                throw new ArgumentNullException(nameof(buffer));
+            if (buffer is null)
+                throw new ArgumentNullException(nameof(buffer), $"{nameof(buffer)} is null.");
 
             if (offset < 0)
-                throw new ArgumentOutOfRangeException(nameof(offset));
+                throw new ArgumentOutOfRangeException(nameof(offset), $"{nameof(offset)} is negative.");
             if (count < 0)
-                throw new ArgumentOutOfRangeException(nameof(count));
+                throw new ArgumentOutOfRangeException(nameof(count), $"{nameof(count)} is negative.");
 
             var len = Math.Min((int)_ptr + count, _str.Length);
             var s = _str.Substring((int)_ptr, len);
@@ -135,8 +140,8 @@ namespace Whitebell.Library.Utils
         /// <summary>ポインタ位置を 0 に戻します。</summary>
         public void Reset() => _ptr = 0;
 
-        /// <param name="offset"></param>
-        /// <param name="origin"></param>
+        /// <summary>Sets the current position of this stream to the given value.</summary>
+        /// <returns>The new position in the stream.</returns>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         public override long Seek(long offset, SeekOrigin origin)
         {
@@ -161,20 +166,18 @@ namespace Whitebell.Library.Utils
             return _ptr;
         }
 
-        /// <param name="value"></param>
+        /// <summary>This method is not supported.</summary>
         /// <exception cref="NotSupportedException"></exception>
         public override void SetLength(long value) => throw new NotSupportedException();
 
         /// <summary>文字列表現。内部文字列を返す。</summary>
         public override string ToString() => _str;
 
-        /// <param name="buffer"></param>
-        /// <param name="offset"></param>
-        /// <param name="count"></param>
+        /// <summary>This method is not supported.</summary>
         /// <exception cref="NotSupportedException"></exception>
         public override void Write(byte[] buffer, int offset, int count) => throw new NotSupportedException();
 
-        public static implicit operator StringStream(string s) => new StringStream(s ?? "");
+        public static implicit operator StringStream(string? s) => new(s ?? "");
 
         public static explicit operator string(StringStream s) => s is not null ? s.RawString : throw new ArgumentNullException(nameof(s));
     }
