@@ -199,8 +199,6 @@ namespace ERBPP
                                 }
                             }
                         }
-                        if (er.EndOfReader)
-                            goto READLINE_BREAK;
 
                         goto READLINE_REDO;
                     case LineType.EndRegionComment:
