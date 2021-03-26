@@ -225,7 +225,6 @@ namespace ERBPP
                     prevType = el.Type;
                 ew.Flush();
             }
-        READLINE_BREAK:
 
             if (regionStack.Count != 0)
                 throw new FormatException($"region/endregion stack err. c={regionStack.Count}");
