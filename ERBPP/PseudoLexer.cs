@@ -781,21 +781,14 @@ namespace ERBPP
                         SkipSpace();
 
                         // 変数っぽく見えるものは変数と仮定する
-                        if (IsVariableSeparator(ss.Current) || ss.Current == '=')
+#pragma warning disable IDE0047 // Remove unnecessary parentheses
+                        if (IsVariableSeparator(ss.Current) // VAR:XXX
+                            || ss.Current == '=' // VAR = ...
+                            || ((ss.Current == '+' || ss.Current == '-' || ss.Current == '*' || ss.Current == '/' || ss.Current == '\'') && ss.Peek(1) == '=') // VAR += n, VAR -= n, VAR *= n, VAR /= n, VAR '= "..."
+                            || ((ss.Current == '+' || ss.Current == '-') && ss.Peek(1) == ss.Current) // VAR++, VAR--
+                            )
+#pragma warning restore
                         {
-                            // VAR:XXX ... , VAR = ...
-                            erhGlobalUdv.Add(ident.ToUpper());
-                            return new Token(LineType.ErhUserDefVariable);
-                        }
-                        else if ((ss.Current == '+' || ss.Current == '-' || ss.Current == '*' || ss.Current == '/' || ss.Current == '\'') && ss.Peek(1) == '=')
-                        {
-                            // VAR += n, VAR -= n, VAR *= n, VAR /= n, VAR '= "..."
-                            erhGlobalUdv.Add(ident.ToUpper());
-                            return new Token(LineType.ErhUserDefVariable);
-                        }
-                        else if ((ss.Current == '+' || ss.Current == '-') && ss.Peek(1) == ss.Current)
-                        {
-                            // VAR++, VAR--
                             erhGlobalUdv.Add(ident.ToUpper());
                             return new Token(LineType.ErhUserDefVariable);
                         }
