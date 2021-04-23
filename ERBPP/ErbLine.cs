@@ -10,6 +10,7 @@ namespace ERBPP
         string RawString { get; }
 
         /// <summary><paramref name="indentLv"/>で指定した深さのインデント付き文字列を返す</summary>
+        /// <param name="indentLv">インデントの深さ</param>
         /// <returns>インデントした改行付き文字列</returns>
         string ToIndentString(int indentLv);
     }
