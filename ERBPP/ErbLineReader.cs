@@ -9,10 +9,12 @@ namespace ERBPP
     {
         private readonly StreamReader reader;
 
+        private IErbLine? peekLine;
+
         /// <summary>Gets a value that indicates whether the current read position is at the end of the reader.</summary>
         /// <returns><see langword="true"/> if the current read position is at the end of the reader; otherwise <see langword="false"/>.</returns>
         /// <exception cref="ObjectDisposedException">The underlying stream has been disposed.</exception>
-        public bool EndOfReader => reader.EndOfStream;
+        public bool EndOfReader => peekLine is null && reader.EndOfStream;
 
         public int LineNum { get; private set; }
 
@@ -36,8 +38,16 @@ namespace ERBPP
         /// <exception cref="FormatException">There is a invalid line.</exception>
         public IErbLine? ReadLine()
         {
-            if (reader.EndOfStream)
+            if (peekLine is not null)
+            {
+                var retv = peekLine;
+                peekLine = null;
+                return retv;
+            }
+            else if (reader.EndOfStream)
+            {
                 return null;
+            }
 
             var line = reader.ReadLine()!.TrimStart();
             LineNum++;
@@ -80,7 +90,14 @@ namespace ERBPP
             throw new FormatException($"line concat ({{ ... }}) hasn't been closed. ({Position})"); // EOSまでたどり着いたケース
         }
 
-#region IDisposable
+        /// <summary>
+        /// Peekするやつ。
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="InvalidOperationException"></exception>
+        public IErbLine PeekLine() => peekLine is not null ? peekLine : !reader.EndOfStream ? peekLine = ReadLine()! : throw new InvalidOperationException();
+
+        #region IDisposable
         /// <summary>Releases all resources used by the <see cref="ErbLineReader"/> object.</summary>
         public void Dispose()
         {

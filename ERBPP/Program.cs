@@ -40,7 +40,6 @@ namespace ERBPP
             while (!er.EndOfReader)
             {
                 el = er.ReadLine()!; // !er.EOR
-            READLINE_REDO:
                 switch (el.Type)
                 {
                     case LineType.Blank:
@@ -163,9 +162,12 @@ namespace ERBPP
                             {
                                 try
                                 {
-                                    el = er.ReadLine()!;
+                                    if (lst.Count > 1)
+                                        _ = er.ReadLine(); // 前回分のPeekLike()で読んだ分を破棄
+                                    el = er.PeekLine();
                                 }
                                 catch (FormatException e) { throw new FormatException(e.Message + $" ({er.Position})", e); }
+
                                 if (el.Type is not LineType.Comment and not LineType.StartRegionComment and not LineType.EndRegionComment)
                                     break;
                                 lst.Add(el);
@@ -199,8 +201,7 @@ namespace ERBPP
                                 }
                             }
                         }
-
-                        goto READLINE_REDO;
+                        continue;
                     case LineType.EndRegionComment:
                         {
                             if (!regionStack.TryPop(out var res))
