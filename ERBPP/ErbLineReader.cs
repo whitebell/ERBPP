@@ -90,11 +90,9 @@ namespace ERBPP
             throw new FormatException($"line concat ({{ ... }}) hasn't been closed. ({Position})"); // EOSまでたどり着いたケース
         }
 
-        /// <summary>
-        /// Peekするやつ。
-        /// </summary>
-        /// <returns></returns>
-        /// <exception cref="InvalidOperationException"></exception>
+        /// <summary>Reads a logical line from the current stream and returns the data as a IErbLine, without consuming it.</summary>
+        /// <returns>The next logical line from the reader.</returns>
+        /// <exception cref="InvalidOperationException">The reader has been reached to end.</exception>
         public IErbLine PeekLine() => peekLine is not null ? peekLine : !reader.EndOfStream ? peekLine = ReadLine()! : throw new InvalidOperationException();
 
         #region IDisposable
