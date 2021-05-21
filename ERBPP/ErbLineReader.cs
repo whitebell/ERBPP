@@ -44,11 +44,12 @@ namespace ERBPP
                 peekLine = null;
                 return retv;
             }
-            else if (reader.EndOfStream)
-            {
-                return null;
-            }
 
+            return reader.EndOfStream ? null : ReadLineImpl();
+        }
+
+        private IErbLine ReadLineImpl()
+        {
             var line = reader.ReadLine()!.TrimStart();
             LineNum++;
             var t = new PseudoLexer(line, Position).GetToken().Type;
@@ -93,7 +94,7 @@ namespace ERBPP
         /// <summary>Reads a logical line from the current stream and returns the data as a IErbLine, without consuming it.</summary>
         /// <returns>The next logical line from the reader.</returns>
         /// <exception cref="InvalidOperationException">The reader has been reached to end.</exception>
-        public IErbLine PeekLine() => peekLine ?? (!reader.EndOfStream ? peekLine = ReadLine()! : throw new InvalidOperationException());
+        public IErbLine PeekLine() => peekLine ?? (!reader.EndOfStream ? peekLine = ReadLineImpl() : throw new InvalidOperationException());
 
         #region IDisposable
         /// <summary>Releases all resources used by the <see cref="ErbLineReader"/> object.</summary>
