@@ -40,11 +40,11 @@ namespace ERBPP
             {
                 ss.NextChar(out var c);
                 sb.Append(c);
-            }
-            while (!ss.EndOfStream && IsIdentifierChar(ss.Current) && !IsVariableSeparator(ss.Current))
-            {
-                ss.NextChar(out var c);
-                sb.Append(c);
+                while (!ss.EndOfStream && IsIdentifierChar(ss.Current) && !IsVariableSeparator(ss.Current))
+                {
+                    ss.NextChar(out c);
+                    sb.Append(c);
+                }
             }
             return sb.ToString();
         }
