@@ -697,8 +697,6 @@ namespace ERBPP
                     case "ITEM":
                     case "ITEMSALES":
                     case "JUEL":
-                    case "LOCAL":
-                    case "LOCALS":
                     case "LOSEBASE":
                     case "MARK":
                     case "MASTERNAME":
@@ -757,12 +755,15 @@ namespace ERBPP
                     case "X":
                     case "Y":
                     case "Z":
+                    case "DITEMTYPE":
+                    // 以下obsolete
+                    case "LOCAL":
+                    case "LOCALS":
                     case "DA":
                     case "DB":
                     case "DC":
                     case "DD":
                     case "DE":
-                    case "DITEMTYPE":
                     case "TA":
                     case "TB":
                         return new Token(LineType.Variable);
