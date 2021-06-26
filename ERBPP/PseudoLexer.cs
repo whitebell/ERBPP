@@ -782,13 +782,11 @@ namespace ERBPP
                         SkipSpace();
 
                         // 変数っぽく見えるものは変数と仮定する
-#pragma warning disable IDE0047 // Remove unnecessary parentheses
                         if (IsVariableSeparator(ss.Current) // VAR:XXX
                             || ss.Current == '=' // VAR = ...
                             || ((ss.Current == '+' || ss.Current == '-' || ss.Current == '*' || ss.Current == '/' || ss.Current == '\'') && ss.Peek(1) == '=') // VAR += n, VAR -= n, VAR *= n, VAR /= n, VAR '= "..."
                             || ((ss.Current == '+' || ss.Current == '-') && ss.Peek(1) == ss.Current) // VAR++, VAR--
                             )
-#pragma warning restore
                         {
                             erhGlobalUdv.Add(ident.ToUpper());
                             return new Token(LineType.ErhUserDefVariable);
