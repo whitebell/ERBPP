@@ -74,7 +74,7 @@ namespace ERBPP
                     _ => new Token(LineType.Comment),
                 };
             }
-            else if (IsFunctionStart(ss.Current))
+            else if (IsFunctionDefinitionStart(ss.Current))
             {
                 functionLocalUdv.Clear();
                 return new Token(LineType.FunctionDefinition);
@@ -801,7 +801,7 @@ namespace ERBPP
         }
 
         private static bool IsCommentStart(char c) => c == ';';
-        private static bool IsFunctionStart(char c) => c == '@';
+        private static bool IsFunctionDefinitionStart(char c) => c == '@';
         private static bool IsAttributeStart(char c) => c == '#';
         private static bool IsVariableSeparator(char c) => c == ':';
         private static bool IsLabelStart(char c) => c == '$';
