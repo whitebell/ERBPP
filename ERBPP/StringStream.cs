@@ -114,10 +114,9 @@ namespace Whitebell.Library.Utils
         /// <param name="chr"></param>
         public virtual bool NextChar(out char chr)
         {
-            _ptr++;
-            if (_ptr <= _str.Length)
+            if (_ptr < _str.Length)
             {
-                chr = _str[(int)_ptr - 1];
+                chr = _str[(int)_ptr++];
                 return true;
             }
             else
