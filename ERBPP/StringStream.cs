@@ -144,25 +144,14 @@ namespace Whitebell.Library.Utils
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         public override long Seek(long offset, SeekOrigin origin)
         {
-            var tmp_ptr = _ptr;
-            switch (origin)
+            var tmp_ptr = origin switch
             {
-                case SeekOrigin.Begin:
-                    tmp_ptr = offset;
-                    break;
-                case SeekOrigin.Current:
-                    tmp_ptr += offset;
-                    break;
-                case SeekOrigin.End:
-                    tmp_ptr = _str.Length + offset;
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(origin));
-            }
-            if (tmp_ptr < 0 || tmp_ptr > _str.Length)
-                throw new ArgumentOutOfRangeException(nameof(offset));
-            _ptr = tmp_ptr;
-            return _ptr;
+                SeekOrigin.Begin => offset,
+                SeekOrigin.Current => _ptr + offset,
+                SeekOrigin.End => _str.Length + offset,
+                _ => throw new ArgumentOutOfRangeException(nameof(origin)),
+            };
+            return 0 <= tmp_ptr && tmp_ptr <= _str.Length ? _ptr = tmp_ptr : throw new ArgumentOutOfRangeException(nameof(offset));
         }
 
         /// <summary>This method is not supported.</summary>
