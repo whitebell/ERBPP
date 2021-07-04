@@ -110,7 +110,7 @@ namespace Whitebell.Library.Utils
             return len;
         }
 
-        /// <summary>末尾でなければ現在の文字をout引数にセットし、ポインタを1進める。末尾ならばnull文字をセットする。</summary>
+        /// <summary>末尾でなければ現在の文字をout引数にセットし、ポインタを1進め、<see langword="true"/>を返す。末尾ならばnull文字をセットし<see langword="false"/>を返す。</summary>
         /// <param name="chr"></param>
         public virtual bool NextChar(out char chr)
         {
