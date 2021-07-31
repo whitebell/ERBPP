@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 
 namespace ERBPP
@@ -40,18 +41,28 @@ namespace ERBPP
     public class ErbConcatLines : IErbLine
     {
         private readonly List<string> lines;
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private string? rawString;
 
         public LineType Type { get; }
-        public string RawString { get; }
+
+        public string RawString
+        {
+            get
+            {
+                if (rawString is not null)
+                    return rawString;
+                var sb = new StringBuilder();
+                foreach (var l in lines)
+                    sb.Append(l); // todo: InvalidOpExcp. の時にしか呼ばれないけど、単純に連結でいいのか考える
+                return rawString = sb.ToString();
+            }
+        }
 
         public ErbConcatLines(LineType type, IReadOnlyList<string> lines)
         {
             Type = type;
             this.lines = new List<string>(lines);
-            var sb = new StringBuilder();
-            foreach (var l in lines)
-                sb.Append(l);
-            RawString = sb.ToString();
         }
 
         public string ToIndentString(int indentLv)
