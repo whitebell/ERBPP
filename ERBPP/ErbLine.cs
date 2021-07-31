@@ -44,7 +44,7 @@ namespace ERBPP
         public LineType Type { get; }
         public string RawString { get; }
 
-        public ErbConcatLines(LineType type, IList<string> lines)
+        public ErbConcatLines(LineType type, IReadOnlyList<string> lines)
         {
             Type = type;
             this.lines = new List<string>(lines);
