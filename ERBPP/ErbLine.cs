@@ -30,10 +30,14 @@ namespace ERBPP
         public string ToIndentString(int indentLv) => new StringBuilder().Insert(0, Constant.Indent, indentLv).AppendLine(RawString).ToString();
     }
 
-    public class ErbBlankLine : IErbLine
+    public sealed class ErbBlankLine : IErbLine
     {
         public LineType Type => LineType.Blank;
         public string RawString => "";
+
+        private ErbBlankLine() { }
+
+        public static ErbBlankLine Instance { get; } = new();
 
         public string ToIndentString(int indentLv) => Environment.NewLine;
     }

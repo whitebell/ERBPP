@@ -59,7 +59,7 @@ namespace ERBPP
                 case LineType.StartConcat:
                     break;
                 case LineType.Blank:
-                    return new ErbBlankLine();
+                    return ErbBlankLine.Instance;
                 default:
                     return new ErbLine(t, line);
             }
