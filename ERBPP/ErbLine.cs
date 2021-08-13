@@ -30,6 +30,7 @@ namespace ERBPP
         public string ToIndentString(int indentLv) => new StringBuilder().Insert(0, Constant.Indent, indentLv).AppendLine(RawString).ToString();
     }
 
+    // IErbLine インターフェース型として扱うので、 static クラスにしないで Singleton パターンとして実装する
     public sealed class ErbBlankLine : IErbLine
     {
         public LineType Type => LineType.Blank;
