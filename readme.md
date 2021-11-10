@@ -11,7 +11,7 @@ ERBファイルのインデントを自動でやるやつ。名前的にはプ�
 
 ## 必要なもの
 
-[.NET 5](https://dotnet.microsoft.com/download/dotnet/5.0)
+[.NET 6](https://dotnet.microsoft.com/download/dotnet/6.0)
 
 ## 使い方
 
