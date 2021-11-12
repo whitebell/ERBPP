@@ -51,14 +51,20 @@ namespace ERBPP
 
         public LineType Type { get; }
 
-        public string RawString => rawString ??= GetRawString();
-
-        private string GetRawString()
+        public string RawString
         {
-            var sb = new StringBuilder();
-            foreach (var l in lines)
-                sb.Append(l); // todo: InvalidOpExcp. の時にしか呼ばれないけど、単純に連結でいいのか考える
-            return sb.ToString();
+            get
+            {
+                return rawString ??= GetRawString();
+
+                string GetRawString()
+                {
+                    var sb = new StringBuilder();
+                    foreach (var l in lines)
+                        sb.Append(l); // todo: InvalidOpExcp. の時にしか呼ばれないけど、単純に連結でいいのか考える
+                    return sb.ToString();
+                }
+            }
         }
 
         public ErbConcatLines(LineType type, IReadOnlyList<string> lines)
