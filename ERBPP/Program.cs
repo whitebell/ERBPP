@@ -133,10 +133,13 @@ namespace ERBPP
                                 {
                                     el = er.ReadLine()!; // !er.EOR
                                 }
-                                catch (FormatException e) { throw new FormatException(e.Message + $" ({er.Position})", e); }
+                                catch (FormatException e)
+                                {
+                                    throw new FormatException(e.Message + $" ({er.Position})", e);
+                                }
 
                                 lst.Add(el);
-                                if (el.Type != LineType.Blank && el.Type != LineType.Comment && el.Type != LineType.StartRegionComment && el.Type != LineType.EndRegionComment)
+                                if (el.Type is not LineType.Blank and not LineType.Comment and not LineType.StartRegionComment and not LineType.EndRegionComment)
                                     break;
                             }
                             foreach (var e in lst)
@@ -166,7 +169,10 @@ namespace ERBPP
                                         _ = er.ReadLine(); // 前回分のPeekLike()で読んだ分を破棄
                                     el = er.PeekLine();
                                 }
-                                catch (FormatException e) { throw new FormatException(e.Message + $" ({er.Position})", e); }
+                                catch (FormatException e)
+                                {
+                                    throw new FormatException(e.Message + $" ({er.Position})", e);
+                                }
 
                                 if (el.Type is not LineType.Comment and not LineType.StartRegionComment and not LineType.EndRegionComment)
                                     break;
@@ -222,7 +228,7 @@ namespace ERBPP
                         break;
                 }
 
-                if (el.Type != LineType.Blank && el.Type != LineType.Comment && el.Type != LineType.StartRegionComment && el.Type != LineType.EndRegionComment)
+                if (el.Type is not LineType.Blank and not LineType.Comment and not LineType.StartRegionComment and not LineType.EndRegionComment)
                     prevType = el.Type;
                 ew.Flush();
             }
