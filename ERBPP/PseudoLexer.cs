@@ -392,10 +392,8 @@ namespace ERBPP
                     case "EXPONENT":
                     case "FIND_CHARADATA":
                     case "FINDCHARA":
-                    case "FINDELEMENT ":
                     case "FINDELEMENT":
                     case "FINDLASTCHARA":
-                    case "FINDLASTELEMENT ":
                     case "FINDLASTELEMENT":
                     case "FONTBOLD":
                     case "FONTITALIC":
@@ -639,12 +637,9 @@ namespace ERBPP
                     case "TIMES":
                     case "TINPUT":
                     case "TINPUTS":
-                    case "TOFULL ":
                     case "TOFULL":
-                    case "TOHALF ":
                     case "TOHALF":
                     case "TOINT":
-                    case "TOLOWER ":
                     case "TOLOWER":
                     case "TONEINPUT":
                     case "TONEINPUTS":
@@ -652,7 +647,6 @@ namespace ERBPP
                     case "TOOLTIP_SETDELAY":
                     case "TOOLTIP_SETDURATION":
                     case "TOSTR":
-                    case "TOUPPER ":
                     case "TOUPPER":
                     case "TWAIT":
                     case "UNICODE":
