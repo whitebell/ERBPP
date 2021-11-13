@@ -346,8 +346,8 @@ namespace ERBPP
                     case "CLEARBIT":
                     case "CLEARLINE":
                     case "CLEARTEXTBOX":
-                    case "CLIENTHEIGHT ":
-                    case "CLIENTWIDTH ":
+                    case "CLIENTHEIGHT":
+                    case "CLIENTWIDTH":
                     case "CMATCH":
                     case "COLOR_FROMNAME":
                     case "COLOR_FROMRGB":
